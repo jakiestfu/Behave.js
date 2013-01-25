@@ -28,7 +28,7 @@ var editor = Behave({
     textarea : Textarea element to apply the behaviors to
   </li>
   <li>
-    replaceTab : Pressing the tab key will insert a tab instead of cycle input focus 
+    replaceTab : Pressing the tab key will insert a tab instead of cycle input focus. If you are holding shift, and there is a full tab before your cursor (whatever your tab may be), it will unindent.
   </li>
   <li>
     softTabs : If set to true, spaces will be used instead of a tab character
