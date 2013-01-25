@@ -105,8 +105,7 @@ var Behave = Behave || function (userOpts) {
     intercept = {
         tabKey: function (e) {
             if (e.keyCode == 9) {
-            	console.log(e);
-                utils.preventDefaultEvent(e);
+            	utils.preventDefaultEvent(e);
 
                 var pos = utils.cursor.get(),
                     val = defaults.textarea.value,
