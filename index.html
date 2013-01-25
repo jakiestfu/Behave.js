@@ -33,7 +33,7 @@
 			
 			<div>
 				<h1>Defaults &amp Options</h1>
-				<pre><code>Behave({
+				<pre><code>var editor = Behave({
     textarea: null,
     replaceTab: true,
     softTabs: true,
@@ -86,6 +86,15 @@
 			</div>
 			
 			<div>
+				<h1>Methods</h1>
+				<pre><code>editor.destroy();</code></pre>
+				<dl class="params">
+					<dt><span>destroy</span></dt>
+					<dd><p>Removes all event listeners from your textarea</p></dd>
+				</dl>
+			</div>
+			
+			<div>
 				<h1>Demo</h1>
 				
 				<div class="opts">
@@ -126,7 +135,7 @@
 			return id=="softTabSize" ? document.getElementById(id).value : document.getElementById(id).checked;
 		}
 		
-		function doDemo(){
+		function doDemo(focus){
 			if(window.editor){
 				window.editor.destroy();
 			}
@@ -140,16 +149,20 @@
 			    autoStrip: 		_val('autoStrip'),
 			    autoIndent: 	_val('autoIndent')
 			});
-			document.getElementById('demo').focus();
+			if(focus){
+				document.getElementById('demo').focus();
+			}
 		}
 	
 		window.onload = function(){
 			var toListen = document.getElementsByTagName('input'),
 				i;
 			for(i=0; i<toListen.length; i++){
-				toListen[i].addEventListener('change', doDemo);
+				toListen[i].addEventListener('change', function(){
+					doDemo.call(null, true);
+				});
 			}
-			doDemo();
+			doDemo(false);
 		};
 	</script>
 </body>
