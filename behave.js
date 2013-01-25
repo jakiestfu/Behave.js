@@ -105,6 +105,7 @@ var Behave = Behave || function (userOpts) {
     intercept = {
         tabKey: function (e) {
             if (e.keyCode == 9) {
+            	console.log(e);
                 utils.preventDefaultEvent(e);
 
                 var pos = utils.cursor.get(),
@@ -112,9 +113,18 @@ var Behave = Behave || function (userOpts) {
                     left = val.substring(0, pos),
                     right = val.substring(pos),
                     edited = left + tab + right;
-                defaults.textarea.value = edited;
-                utils.cursor.set(pos + tab.length);
-                return false;
+
+                if(e.shiftKey){
+                    if(val.substring(pos-tab.length, pos) == tab){
+                        edited = val.substring(0, pos-tab.length) + right;
+                        defaults.textarea.value = edited;
+                        utils.cursor.set(pos-tab.length);
+                    }
+                } else {
+                    defaults.textarea.value = edited;
+                    utils.cursor.set(pos + tab.length);
+                    return false;
+                }
             }
             return true;
         },
@@ -134,8 +144,7 @@ var Behave = Behave || function (userOpts) {
                     closingBreak = "",
                     finalCursorPos,
                     i;
-                
-                
+
                 if(!numTabs){
                     finalCursorPos = 1;
                 } else {
@@ -152,7 +161,7 @@ var Behave = Behave || function (userOpts) {
                     } 
                     
                 }
-                
+
                 var edited = left + "\n" + ourIndent + closingBreak + (ourIndent.substring(0, ourIndent.length-tab.length) ) + right;
                 defaults.textarea.value = edited;
                 utils.cursor.set(pos + finalCursorPos);
@@ -227,7 +236,7 @@ var Behave = Behave || function (userOpts) {
             if(defaults.replaceTab){ utils.addEvent(defaults.textarea, 'keydown', intercept.tabKey); }
             if(defaults.autoIndent){ utils.addEvent(defaults.textarea, 'keydown', intercept.enterKey); }
             if(defaults.autoStrip){ utils.addEvent(defaults.textarea, 'keydown', intercept.deleteKey); }
-   
+
             utils.addEvent(defaults.textarea, 'keypress', action.filter);
         }
     },
