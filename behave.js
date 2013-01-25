@@ -114,7 +114,8 @@ var Behave = Behave || function (userOpts) {
                 }
             }
            
-            return levels - toDecrement;
+            var finalLevels = levels - toDecrement;
+            return finalLevels >=0 ? finalLevels : 0;
         },
         deepExtend: function(destination, source) {
             for (var property in source) {
@@ -223,7 +224,7 @@ var Behave = Behave || function (userOpts) {
                     closingBreak = "",
                     finalCursorPos,
                     i;
-
+				
                 if(!numTabs){
                     finalCursorPos = 1;
                 } else {
