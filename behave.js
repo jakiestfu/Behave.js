@@ -93,12 +93,19 @@ var Behave = Behave || function (userOpts) {
             } else if (element.attachEvent) {
                 element.attachEvent("on"+eventName, func);
             }
+        },
+        preventDefaultEvent: function(e){
+        	if(e.preventDefault){
+	        	e.preventDefault();
+        	} else {
+	        	e.returnValue = false;
+        	}
         }
     },
     intercept = {
         tabKey: function (e) {
             if (e.keyCode == 9) {
-                e.preventDefault();
+                utils.preventDefaultEvent(e);
 
                 var pos = utils.cursor.get(),
                     val = defaults.textarea.value,
@@ -114,7 +121,7 @@ var Behave = Behave || function (userOpts) {
         enterKey: function (e) {
             if (e.keyCode == 13) {
 
-                e.preventDefault();
+                utils.preventDefaultEvent(e);
 
                 var pos = utils.cursor.get(),
                     val = defaults.textarea.value,
@@ -163,7 +170,7 @@ var Behave = Behave || function (userOpts) {
                     i;
                 for (i in charSettings.keyMap) {
                     if (charSettings.keyMap[i].open == leftChar && charSettings.keyMap[i].close == rightChar) {
-                        e.preventDefault();
+                        utils.preventDefaultEvent(e);
                         var edited = val.substring(0,pos-1) + val.substring(pos+1);
                         defaults.textarea.value = edited;
                         utils.cursor.set(pos - 1);
@@ -174,7 +181,7 @@ var Behave = Behave || function (userOpts) {
     },
     charFuncs = {
         openedChar: function (_char, e) {
-            e.preventDefault();
+            utils.preventDefaultEvent(e);
             var pos = utils.cursor.get(),
                 val = defaults.textarea.value,
                 left = val.substring(0, pos),
@@ -188,7 +195,7 @@ var Behave = Behave || function (userOpts) {
                 val = defaults.textarea.value,
                 toOverwrite = val.substring(pos, pos + 1);
             if (toOverwrite == _char.close) {
-                e.preventDefault();
+                utils.preventDefaultEvent(e);
                 utils.cursor.set(utils.cursor.get() + 1);
                 return true;
             }
@@ -220,7 +227,7 @@ var Behave = Behave || function (userOpts) {
             if(defaults.replaceTab){ utils.addEvent(defaults.textarea, 'keydown', intercept.tabKey); }
             if(defaults.autoIndent){ utils.addEvent(defaults.textarea, 'keydown', intercept.enterKey); }
             if(defaults.autoStrip){ utils.addEvent(defaults.textarea, 'keydown', intercept.deleteKey); }
-            
+   
             utils.addEvent(defaults.textarea, 'keypress', action.filter);
         }
     },
