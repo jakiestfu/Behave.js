@@ -2,7 +2,13 @@
 
 ## What?
 Behave.js is a lightweight library for adding IDE style behaviors to plain text areas, making it much more enjoyable to write code in.
-  		
+* Hard and Soft Tabs
+* Auto Open/Close Paranthesis, Brackets, Braces, Double and Single Quotes
+* Auto delete a paired character
+* Overwrite a paired character
+* Multi-line Indentation/Unindentation
+* Automatic Indentation
+
 ## Usage
 ```javascript
 var editor = new Behave({
@@ -28,7 +34,13 @@ var editor = new Behave({
     textarea : Textarea element to apply the behaviors to
   </li>
   <li>
-    replaceTab : Pressing the tab key will insert a tab instead of cycle input focus. If you are holding shift, and there is a full tab before your cursor (whatever your tab may be), it will unindent.
+    replaceTab : If set to true, replaceTab does three different things:</p>
+<ul>
+<li>Pressing the tab key will insert a tab instead of cycle input focus.</li>
+<li>If you are holding shift, and there is a full tab before your cursor (whatever your tab may be), it will unindent.</li>
+<li>If you have a range selected, both of the above rules will apply to all lines selected (multi-line indent/unindent)</li>
+</ul>
+
   </li>
   <li>
     softTabs : If set to true, spaces will be used instead of a tab character
