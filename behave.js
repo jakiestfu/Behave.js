@@ -5,8 +5,12 @@ var Behave = Behave || function (userOpts) {
     // Fast repeat, uses the `Exponentiation by squaring` algorithm.
     if (typeof String.prototype.repeat !== 'function') {
         String.prototype.repeat = function(times) {
-            if (times < 1) return '';
-            if (times % 2) return this.repeat(times - 1) + this;
+            if (times < 1){
+                return '';
+            }
+            if (times % 2){
+                return this.repeat(times - 1) + this;
+            }
             var half = this.repeat(times / 2);
             return half + half;
         };
@@ -74,25 +78,43 @@ var Behave = Behave || function (userOpts) {
                 } : false;
             }
         },
+        isEven: function(_this,i){
+            return i%2;
+        },
         levelsDeep: function(){
             var pos = utils.cursor.get(),
-                val = defaults.textarea.value,
-                left = val.substring(0, pos),
+                val = defaults.textarea.value;
+            
+            var left = val.substring(0, pos),
                 levels = 0,
                 i, j;
+            
             for(i in left){
                 for (j in charSettings.keyMap) {
                     if(charSettings.keyMap[j].canBreak){
                         if(charSettings.keyMap[j].open == left[i]){
                             levels++;
                         }
+                       
                         if(charSettings.keyMap[j].close == left[i]){
                             levels--;
                         }
                     }
                 }
             }
-            return levels;
+            
+            // Remove cases of quote-enclosed break characters
+            var toDecrement = 0,
+                quoteMap = ["'", "\""];
+            for(i in charSettings.keyMap){
+                if(charSettings.keyMap[i].canBreak){
+                    for(j in quoteMap){
+                        toDecrement += left.split(quoteMap[j]).filter(utils.isEven).join('').split(charSettings.keyMap[i].open).length - 1;
+                    }
+                }
+            }
+           
+            return levels - toDecrement;
         },
         deepExtend: function(destination, source) {
             for (var property in source) {
@@ -169,7 +191,7 @@ var Behave = Behave || function (userOpts) {
                     var left = val.substring(0, pos),
                         right = val.substring(pos),
                         edited = left + tab + right;
-    
+
                     if(e.shiftKey){
                         if(val.substring(pos-tab.length, pos) == tab){
                             edited = val.substring(0, pos-tab.length) + right;
@@ -226,20 +248,23 @@ var Behave = Behave || function (userOpts) {
         },
         deleteKey: function (e) {
             if(e.keyCode == 8){
-                
-                var pos = utils.cursor.get(),
-                    val = defaults.textarea.value,
-                    left = val.substring(0, pos),
-                    right = val.substring(pos),
-                    leftChar = left[left.length - 1],
-                    rightChar = right[0],
-                    i;
-                for (i in charSettings.keyMap) {
-                    if (charSettings.keyMap[i].open == leftChar && charSettings.keyMap[i].close == rightChar) {
-                        utils.preventDefaultEvent(e);
-                        var edited = val.substring(0,pos-1) + val.substring(pos+1);
-                        defaults.textarea.value = edited;
-                        utils.cursor.set(pos - 1);
+
+                if( utils.cursor.selection() === false ){
+
+                    var pos = utils.cursor.get(),
+                        val = defaults.textarea.value,
+                        left = val.substring(0, pos),
+                        right = val.substring(pos),
+                        leftChar = left[left.length - 1],
+                        rightChar = right[0],
+                        i;
+                    for (i in charSettings.keyMap) {
+                        if (charSettings.keyMap[i].open == leftChar && charSettings.keyMap[i].close == rightChar) {
+                            utils.preventDefaultEvent(e);
+                            var edited = val.substring(0,pos-1) + val.substring(pos+1);
+                            defaults.textarea.value = edited;
+                            utils.cursor.set(pos - 1);
+                        }
                     }
                 }
             }
