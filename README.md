@@ -1,4 +1,4 @@
-<img src="https://raw.github.com/jakiestfu/Behave.js/gh-pages/assets/hero.png">
+<a href="http://jakiestfu.github.com/Behave.js/"><img src="https://raw.github.com/jakiestfu/Behave.js/gh-pages/assets/hero.png"></a>
 
 ## What?
 Behave.js is a lightweight library for adding IDE style behaviors to plain text areas, making it much more enjoyable to write code in.
