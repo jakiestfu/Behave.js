@@ -86,6 +86,13 @@ var Behave = Behave || function (userOpts) {
                 }
             }
             return destination;
+        },
+        addEvent: function addEvent(element, eventName, func) {
+            if (element.addEventListener){
+                element.addEventListener(eventName,func,false);
+            } else if (element.attachEvent) {
+                element.attachEvent("on"+eventName, func);
+            }
         }
     },
     intercept = {
@@ -209,12 +216,12 @@ var Behave = Behave || function (userOpts) {
             
         },
         listen: function () {
+
+            if(defaults.replaceTab){ utils.addEvent(defaults.textarea, 'keydown', intercept.tabKey); }
+            if(defaults.autoIndent){ utils.addEvent(defaults.textarea, 'keydown', intercept.enterKey); }
+            if(defaults.autoStrip){ utils.addEvent(defaults.textarea, 'keydown', intercept.deleteKey); }
             
-            if(defaults.replaceTab){ defaults.textarea.addEventListener('keydown', intercept.tabKey); }
-            if(defaults.autoIndent){ defaults.textarea.addEventListener('keydown', intercept.enterKey); }
-            if(defaults.autoStrip){ defaults.textarea.addEventListener('keydown', intercept.deleteKey); }
-            
-            defaults.textarea.addEventListener('keypress', action.filter);
+            utils.addEvent(defaults.textarea, 'keypress', action.filter);
         }
     },
     init = function (opts) {
