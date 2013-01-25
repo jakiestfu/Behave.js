@@ -12,7 +12,7 @@ var editor = new Behave({
 
 ## Defaults and Options
 ```javascript
-var editor = Behave({
+var editor = new Behave({
     textarea: null,
     replaceTab: true,
     softTabs: true,
