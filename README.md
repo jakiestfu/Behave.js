@@ -2,6 +2,7 @@
 
 ## What?
 Behave.js is a lightweight library for adding IDE style behaviors to plain text areas, making it much more enjoyable to write code in.
+* No Dependencies
 * Hard and Soft Tabs
 * Auto Open/Close Paranthesis, Brackets, Braces, Double and Single Quotes
 * Auto delete a paired character
