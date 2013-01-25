@@ -16,6 +16,33 @@ var Behave = Behave || function (userOpts) {
         };
     }
 
+    if (typeof Array.prototype.filter !== 'function') {
+        Array.prototype.filter = function(func /*, thisp */) {
+            "use strict";
+            if (this == null) {
+                throw new TypeError();
+            }
+
+            var t = Object(this),
+                len = t.length >>> 0;
+            if (typeof func != "function"){
+                throw new TypeError();
+            }
+            var res = [],
+            	thisp = arguments[1];
+            for (var i = 0; i < len; i++) {
+                if (i in t) {
+                    var val = t[i];
+                    if (func.call(thisp, val, i, t)) {
+                        res.push(val);
+                    }
+                }
+            }
+            return res;
+        };
+    }
+
+	
     var defaults = {
         textarea: null,
         replaceTab: true,
@@ -42,6 +69,7 @@ var Behave = Behave || function (userOpts) {
         cursor: {
             get: function doGetCaretPosition() {
                 var caretPos = 0;
+                
                 if (typeof defaults.textarea.selectionStart === 'number') {
                     caretPos = defaults.textarea.selectionStart;
                 } else if (document.selection) {
@@ -88,16 +116,16 @@ var Behave = Behave || function (userOpts) {
             var left = val.substring(0, pos),
                 levels = 0,
                 i, j;
-            
-            for(i in left){
-                for (j in charSettings.keyMap) {
-                    if(charSettings.keyMap[j].canBreak){
-                        if(charSettings.keyMap[j].open == left[i]){
-                            levels++;
+           
+            for(i=0; i<left.length; i++){
+                for (j=0; j<charSettings.keyMap.length; j++) {
+                	if(charSettings.keyMap[j].canBreak){
+                        if(charSettings.keyMap[j].open == left.charAt(i)){
+                        	levels++;
                         }
                        
-                        if(charSettings.keyMap[j].close == left[i]){
-                            levels--;
+                        if(charSettings.keyMap[j].close == left.charAt(i)){
+                        	levels--;
                         }
                     }
                 }
@@ -115,6 +143,7 @@ var Behave = Behave || function (userOpts) {
             }
            
             var finalLevels = levels - toDecrement;
+            
             return finalLevels >=0 ? finalLevels : 0;
         },
         deepExtend: function(destination, source) {
@@ -210,15 +239,15 @@ var Behave = Behave || function (userOpts) {
         },
         enterKey: function (e) {
             if (e.keyCode == 13) {
-
+				
                 utils.preventDefaultEvent(e);
-
+				
                 var pos = utils.cursor.get(),
                     val = defaults.textarea.value,
                     left = val.substring(0, pos),
                     right = val.substring(pos),
-                    leftChar = left[left.length - 1],
-                    rightChar = right[0],
+                    leftChar = left.charAt(left.length - 1),
+                    rightChar = right.charAt(0),
                     numTabs = utils.levelsDeep(),
                     ourIndent = "",
                     closingBreak = "",
@@ -241,7 +270,7 @@ var Behave = Behave || function (userOpts) {
                     } 
                     
                 }
-
+				
                 var edited = left + "\n" + ourIndent + closingBreak + (ourIndent.substring(0, ourIndent.length-tab.length) ) + right;
                 defaults.textarea.value = edited;
                 utils.cursor.set(pos + finalCursorPos);
@@ -256,8 +285,8 @@ var Behave = Behave || function (userOpts) {
                         val = defaults.textarea.value,
                         left = val.substring(0, pos),
                         right = val.substring(pos),
-                        leftChar = left[left.length - 1],
-                        rightChar = right[0],
+                        leftChar = left.charAt(left.length - 1),
+                        rightChar = right.charAt(0),
                         i;
                     for (i in charSettings.keyMap) {
                         if (charSettings.keyMap[i].open == leftChar && charSettings.keyMap[i].close == rightChar) {
@@ -297,9 +326,9 @@ var Behave = Behave || function (userOpts) {
     action = {
         filter: function (e) {
             
-            var _char = String.fromCharCode(e.which),
+            var _char = String.fromCharCode(e.which || e.keyCode),
                 i;
-
+			
             for (i in charSettings.keyMap) {
 
                 if (charSettings.keyMap[i].close == _char) {
