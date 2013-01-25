@@ -2,9 +2,15 @@ var Behave = Behave || function (userOpts) {
 
     'use strict';
 
-    String.prototype.repeat = function( num ){
-        return new Array( num + 1 ).join( this );
-    };
+    // Fast repeat, uses the `Exponentiation by squaring` algorithm.
+    if (typeof String.prototype.repeat !== 'function') {
+        String.prototype.repeat = function(times) {
+            if (times < 1) return '';
+            if (times % 2) return this.repeat(times - 1) + this;
+            var half = this.repeat(times / 2);
+            return half + half;
+        };
+    }
 
     var defaults = {
         textarea: null,
