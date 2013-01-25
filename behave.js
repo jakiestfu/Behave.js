@@ -53,6 +53,19 @@ var Behave = Behave || function (userOpts) {
                     range.moveStart('character', pos);
                     range.select();
                 }
+            },
+            select: function(start, end){
+                defaults.textarea.selectionStart = start;
+                defaults.textarea.selectionEnd = end;
+            },
+            selection: function(){
+                var start = defaults.textarea.selectionStart,
+                    end = defaults.textarea.selectionEnd;
+                    
+                return  start != end ? {
+                    start: defaults.textarea.selectionStart,
+                    end: defaults.textarea.selectionEnd
+                } : false;
             }
         },
         levelsDeep: function(){
@@ -96,33 +109,72 @@ var Behave = Behave || function (userOpts) {
         },
         preventDefaultEvent: function(e){
             if(e.preventDefault){
-	            e.preventDefault();
+                e.preventDefault();
             } else {
-	            e.returnValue = false;
+                e.returnValue = false;
             }
         }
     },
     intercept = {
         tabKey: function (e) {
             if (e.keyCode == 9) {
-            	utils.preventDefaultEvent(e);
-
-                var pos = utils.cursor.get(),
-                    val = defaults.textarea.value,
-                    left = val.substring(0, pos),
-                    right = val.substring(pos),
-                    edited = left + tab + right;
-
-                if(e.shiftKey){
-                    if(val.substring(pos-tab.length, pos) == tab){
-                        edited = val.substring(0, pos-tab.length) + right;
-                        defaults.textarea.value = edited;
-                        utils.cursor.set(pos-tab.length);
+                utils.preventDefaultEvent(e);
+                
+                var selection = utils.cursor.selection(),
+                    pos = utils.cursor.get(),
+                    val = defaults.textarea.value;
+                
+                if(selection){
+                    
+                    var tempStart = selection.start;
+                    while(tempStart--){
+                        if(val.charAt(tempStart)=="\n"){
+                            selection.start = tempStart + 1;
+                            break;
+                        }
+                    }
+                    
+                    var toIndent = val.substring(selection.start, selection.end),
+                        lines = toIndent.split("\n"),
+                        i;
+                        
+                        
+                    if(e.shiftKey){
+                        for(i in lines){
+                            if(lines[i].substring(0,tab.length) == tab){
+                                lines[i] = lines[i].substring(tab.length);
+                            }
+                        }
+                        toIndent = lines.join("\n");
+                        
+                        defaults.textarea.value = val.substring(0,selection.start) + toIndent + val.substring(selection.end);
+                        utils.cursor.select(selection.start, selection.start+toIndent.length);
+                        
+                    } else {
+                        for(i in lines){
+                            lines[i] = tab + lines[i];
+                        }
+                        toIndent = lines.join("\n");
+                        
+                        defaults.textarea.value = val.substring(0,selection.start) + toIndent + val.substring(selection.end);
+                        utils.cursor.select(selection.start, selection.start+toIndent.length);
                     }
                 } else {
-                    defaults.textarea.value = edited;
-                    utils.cursor.set(pos + tab.length);
-                    return false;
+                    var left = val.substring(0, pos),
+                        right = val.substring(pos),
+                        edited = left + tab + right;
+    
+                    if(e.shiftKey){
+                        if(val.substring(pos-tab.length, pos) == tab){
+                            edited = val.substring(0, pos-tab.length) + right;
+                            defaults.textarea.value = edited;
+                            utils.cursor.set(pos-tab.length);
+                        }
+                    } else {
+                        defaults.textarea.value = edited;
+                        utils.cursor.set(pos + tab.length);
+                        return false;
+                    }
                 }
             }
             return true;
