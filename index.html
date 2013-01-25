@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>Behave</title>
+  
+	<link href='http://fonts.googleapis.com/css?family=Coustard:400,900' rel='stylesheet' type='text/css'>
+	<link href='http://necolas.github.com/normalize.css/2.1.0/normalize.css' rel='stylesheet' type='text/css'>
+	<link href='assets/site.css' rel='stylesheet' type='text/css'>
+</head>
+<body>
+	
+	<div id="austin"></div>
+	
+	<header><a href="#">Behave.js</a></header>
+	<div id="content">
+		
+		<div class="inner">
+			
+			<div>
+				<h1>What?</h1>
+				<p>Behave.js is a lightweight library for adding IDE style behaviors to plain text areas, making it much more enjoyable to write code in.</p>
+			</div>
+			
+			<div>
+				<h1>Usage</h1>
+				<pre><code>var editor = new Behave({
+    textarea: document.getElementById('myTextarea')
+});</code></pre>
+			</div>
+			
+			<div>
+				<h1>Defaults &amp Options</h1>
+				<pre><code>Behave({
+    textarea: null,
+    replaceTab: true,
+    softTabs: true,
+    softTabSize: 4,
+    autoOpen: true,
+    overwrite: true,
+    autoStrip: true,
+    autoIndent: true
+});</code></pre>
+				
+				<dl class="params">
+				
+					<dt><span>textarea</span></dt>
+					<dd><p>Textarea element to apply the behaviors to</p></dd>
+				
+					<dt><span>replaceTab</span></dt>
+					<dd><p>Pressing the tab key will insert a tab instead of cycle input focus</p></dd>
+				
+					<dt><span>softTabs</span></dt>
+					<dd><p>If set to true, spaces will be used instead of a tab character</p></dd>
+				
+					<dt><span>softTabSize</span></dt>
+					<dd><p>If <code>softTabs</code> is set to true, the number of spaces used is defined here</p></dd>
+				
+					<dt><span>autoOpen</span></dt>
+					<dd>
+						<p>
+							If any of the following characters are typed, their counterparts are automatically added: 
+							<ul>
+								<li><b>(</b> adds <b>)</b></li>
+								<li><b>{</b> adds <b>}</b></li>
+								<li><b>[</b> adds <b>]</b></li>
+								<li><b>"</b> adds <b>"</b></li>
+								<li><b>'</b> adds <b>'</b></li>
+							</ul>
+						</p>
+					</dd>
+				
+					<dt><span>overwrite</span></dt>
+					<dd><p>If you type a closing character directly before an identical character, it will overwrite it instead of adding it. Best used with <code>autoOpen</code> set to true</p></dd>
+				
+					<dt><span>autoStrip</span></dt>
+					<dd><p>If set to true, and your cursor is between two paired characters, pressing backspace will delete both instead of just the first</p></dd>
+				
+					<dt><span>autoIndent</span></dt>
+					<dd><p>If set to true, automatic indentation of your code will be attempted. Best used with <code>autoOpen</code> set to true</p></dd>
+				
+				</dl>
+				
+			</div>
+			
+			<div>
+				<h1>Demo</h1>
+				
+				<div class="opts">
+					<label>Replace Tab: <input type="checkbox" checked="checked" id="replaceTab"></label>
+					<label>Soft Tabs: <input type="checkbox" checked="checked" id="softTabs"></label>
+					<label>Soft Tab Size: <input type="text" id="softTabSize" value="4" class="text"></label>
+					<label>Auto Open: <input type="checkbox" checked="checked" id="autoOpen"></label>
+					<label>Overwrite: <input type="checkbox" checked="checked" id="overwrite"></label>
+					<label>Auto Strip: <input type="checkbox" checked="checked" id="autoStrip"></label>
+					<label>Auto Indent: <input type="checkbox" checked="checked" id="autoIndent"></label>
+				</div>
+				
+				<textarea id="demo" placeholder="Try writing a javascript function or some CSS"></textarea>
+			</div>
+			
+			<div class="small">
+				<h1>License</h1>
+				<p><b>MIT Licensing</b></p>
+				<p>Copyright (c) 2013 Jacob Kelley</p>
+				<p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p>
+				<p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p>
+				<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+			</div>
+			
+		</div>
+		
+	</div>
+	
+	
+	<script type='text/javascript' src="src/behave.js"></script>
+	<script type="text/javascript">
+	
+		function _val(id){
+			return id=="softTabSize" ? document.getElementById(id).value : document.getElementById(id).checked;
+		}
+		
+		function doDemo(){
+			if(window.editor){
+				window.editor.destroy();
+			}
+			window.editor = new Behave({
+				textarea: document.getElementById('demo'),
+				replaceTab: 	_val('replaceTab'),
+			    softTabs: 		_val('softTabs'),
+			    softTabSize: 	parseInt( _val('softTabSize') ),
+			    autoOpen: 		_val('autoOpen'),
+			    overwrite: 		_val('overwrite'),
+			    autoStrip: 		_val('autoStrip'),
+			    autoIndent: 	_val('autoIndent')
+			});
+			document.getElementById('demo').focus();
+		}
+	
+		window.onload = function(){
+			var toListen = document.getElementsByTagName('input'),
+				i;
+			for(i=0; i<toListen.length; i++){
+				toListen[i].addEventListener('change', doDemo);
+			}
+			doDemo();
+		};
+	</script>
+</body>
+</html>
