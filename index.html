@@ -165,9 +165,15 @@
 			var toListen = document.getElementsByTagName('input'),
 				i;
 			for(i=0; i<toListen.length; i++){
-				toListen[i].addEventListener('change', function(){
-					doDemo.call(null, true);
-				});
+				if(toListen[i].addEventListener){
+					toListen[i].addEventListener('change', function(){
+						doDemo.call(null, true);
+					});
+				} else {
+					toListen[i].attachEventListener('onchange', function(){
+						doDemo.call(null, true);
+					});
+				}
 			}
 			doDemo(false);
 		};
