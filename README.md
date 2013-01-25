@@ -34,10 +34,10 @@ var editor = Behave({
     softTabs : If set to true, spaces will be used instead of a tab character
   </li>
   <li>
-    `softTabSize` : If <code>softTabs</code> is set to true, the number of spaces used is defined here
+    softTabSize : If <code>softTabs</code> is set to true, the number of spaces used is defined here
   </li>
   <li>
-    `autoOpen` : If any of the following characters are typed, their counterparts are automatically added:  
+    autoOpen : If any of the following characters are typed, their counterparts are automatically added:  
     <ul>
     	<li><b>(</b> adds <b>)</b></li>
   		<li><b>{</b> adds <b>}</b></li>
@@ -47,13 +47,13 @@ var editor = Behave({
   	</ul>
   </li>
   <li>
-    `overwrite` : If you type a closing character directly before an identical character, it will overwrite it instead of adding it. Best used with <code>autoOpen</code> set to true 
+    overwrite : If you type a closing character directly before an identical character, it will overwrite it instead of adding it. Best used with <code>autoOpen</code> set to true 
   </li>
   <li>
-    `autoStrip` : If set to true, and your cursor is between two paired characters, pressing backspace will delete both instead of just the first 
+    autoStrip : If set to true, and your cursor is between two paired characters, pressing backspace will delete both instead of just the first 
   </li>
   <li>
-    `autoIndent` : If set to true, automatic indentation of your code will be attempted. Best used with <code>autoOpen</code> set to true 
+    autoIndent : If set to true, automatic indentation of your code will be attempted. Best used with <code>autoOpen</code> set to true 
   </li>
 </ul>
 
