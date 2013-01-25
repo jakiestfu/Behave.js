@@ -38,13 +38,13 @@ var Behave = Behave || function (userOpts) {
         cursor: {
             get: function doGetCaretPosition() {
                 var caretPos = 0;
-                if (document.selection) {
+                if (typeof defaults.textarea.selectionStart === 'number') {
+                    caretPos = defaults.textarea.selectionStart;
+                } else if (document.selection) {
                     defaults.textarea.focus();
                     var selection = document.selection.createRange();
                     selection.moveStart('character', -defaults.textarea.value.length);
                     caretPos = selection.text.length;
-                } else if (defaults.textarea.selectionStart || defaults.textarea.selectionStart == '0') {
-                    caretPos = defaults.textarea.selectionStart;
                 }
                 return caretPos;
             },
