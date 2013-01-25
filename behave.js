@@ -95,11 +95,11 @@ var Behave = Behave || function (userOpts) {
             }
         },
         preventDefaultEvent: function(e){
-        	if(e.preventDefault){
-	        	e.preventDefault();
-        	} else {
-	        	e.returnValue = false;
-        	}
+            if(e.preventDefault){
+	            e.preventDefault();
+            } else {
+	            e.returnValue = false;
+            }
         }
     },
     intercept = {
