@@ -75,6 +75,7 @@ var Behave = Behave || function (userOpts) {
                 } else if (document.selection) {
                     defaults.textarea.focus();
                     var selection = document.selection.createRange();
+                    
                     selection.moveStart('character', -defaults.textarea.value.length);
                     caretPos = selection.text.length;
                 }
@@ -239,9 +240,9 @@ var Behave = Behave || function (userOpts) {
         },
         enterKey: function (e) {
             if (e.keyCode == 13) {
-				
+
                 utils.preventDefaultEvent(e);
-				
+
                 var pos = utils.cursor.get(),
                     val = defaults.textarea.value,
                     left = val.substring(0, pos),
@@ -253,7 +254,6 @@ var Behave = Behave || function (userOpts) {
                     closingBreak = "",
                     finalCursorPos,
                     i;
-				
                 if(!numTabs){
                     finalCursorPos = 1;
                 } else {
@@ -270,7 +270,7 @@ var Behave = Behave || function (userOpts) {
                     } 
                     
                 }
-				
+
                 var edited = left + "\n" + ourIndent + closingBreak + (ourIndent.substring(0, ourIndent.length-tab.length) ) + right;
                 defaults.textarea.value = edited;
                 utils.cursor.set(pos + finalCursorPos);
@@ -308,6 +308,7 @@ var Behave = Behave || function (userOpts) {
                 left = val.substring(0, pos),
                 right = val.substring(pos),
                 edited = left + _char.open + _char.close + right;
+            
             defaults.textarea.value = edited;
             utils.cursor.set(pos + 1);
         },
@@ -328,7 +329,7 @@ var Behave = Behave || function (userOpts) {
             
             var _char = String.fromCharCode(e.which || e.keyCode),
                 i;
-			
+
             for (i in charSettings.keyMap) {
 
                 if (charSettings.keyMap[i].close == _char) {
