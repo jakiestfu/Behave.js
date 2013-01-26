@@ -18,7 +18,6 @@ var Behave = Behave || function (userOpts) {
 
     if (typeof Array.prototype.filter !== 'function') {
         Array.prototype.filter = function(func /*, thisp */) {
-            "use strict";
             if (this == null) {
                 throw new TypeError();
             }
@@ -29,7 +28,7 @@ var Behave = Behave || function (userOpts) {
                 throw new TypeError();
             }
             var res = [],
-            	thisp = arguments[1];
+                thisp = arguments[1];
             for (var i = 0; i < len; i++) {
                 if (i in t) {
                     var val = t[i];
@@ -42,7 +41,6 @@ var Behave = Behave || function (userOpts) {
         };
     }
 
-	
     var defaults = {
         textarea: null,
         replaceTab: true,
@@ -51,7 +49,8 @@ var Behave = Behave || function (userOpts) {
         autoOpen: true,
         overwrite: true,
         autoStrip: true,
-        autoIndent: true
+        autoIndent: true,
+        fence: false
     },
     tab,
     charSettings = {
@@ -69,13 +68,13 @@ var Behave = Behave || function (userOpts) {
         cursor: {
             get: function doGetCaretPosition() {
                 var caretPos = 0;
-                
+
                 if (typeof defaults.textarea.selectionStart === 'number') {
                     caretPos = defaults.textarea.selectionStart;
                 } else if (document.selection) {
                     defaults.textarea.focus();
                     var selection = document.selection.createRange();
-                    
+
                     selection.moveStart('character', -defaults.textarea.value.length);
                     caretPos = selection.text.length;
                 }
@@ -107,31 +106,68 @@ var Behave = Behave || function (userOpts) {
                 } : false;
             }
         },
+        editor: {
+            get: function(){
+                return defaults.textarea.value;
+            },
+            set: function(data){
+                defaults.textarea.value = data;
+            }
+        },
+        fenceRange: function(){
+            if(typeof defaults.fence == "string"){
+
+                var data = utils.editor.get(),
+                    pos = utils.cursor.get(),
+                    hacked = 0,
+                    matchedFence = data.indexOf(defaults.fence),
+                    matchCase = 0;
+
+                while(matchedFence>=0){
+                    matchCase++;
+                    if( pos < (matchedFence+hacked) ){
+                        break;
+                    }
+
+                    hacked += matchedFence+defaults.fence.length;
+                    data = data.substring(matchedFence+defaults.fence.length);
+                    matchedFence = data.indexOf(defaults.fence);
+
+                }
+
+                if( (hacked) < pos && ( (matchedFence+hacked) > pos ) && matchCase%2===0){
+                    return true;
+                }
+                return false;
+            } else {
+                return true;
+            }
+        },
         isEven: function(_this,i){
             return i%2;
         },
         levelsDeep: function(){
             var pos = utils.cursor.get(),
                 val = defaults.textarea.value;
-            
+
             var left = val.substring(0, pos),
                 levels = 0,
                 i, j;
-           
+
             for(i=0; i<left.length; i++){
                 for (j=0; j<charSettings.keyMap.length; j++) {
-                	if(charSettings.keyMap[j].canBreak){
+                    if(charSettings.keyMap[j].canBreak){
                         if(charSettings.keyMap[j].open == left.charAt(i)){
-                        	levels++;
+                            levels++;
                         }
-                       
+
                         if(charSettings.keyMap[j].close == left.charAt(i)){
-                        	levels--;
+                            levels--;
                         }
                     }
                 }
             }
-            
+
             // Remove cases of quote-enclosed break characters
             var toDecrement = 0,
                 quoteMap = ["'", "\""];
@@ -142,9 +178,9 @@ var Behave = Behave || function (userOpts) {
                     }
                 }
             }
-           
+
             var finalLevels = levels - toDecrement;
-            
+
             return finalLevels >=0 ? finalLevels : 0;
         },
         deepExtend: function(destination, source) {
@@ -176,15 +212,18 @@ var Behave = Behave || function (userOpts) {
     },
     intercept = {
         tabKey: function (e) {
+
+            if(!utils.fenceRange()){ return; }
+
             if (e.keyCode == 9) {
                 utils.preventDefaultEvent(e);
-                
+
                 var selection = utils.cursor.selection(),
                     pos = utils.cursor.get(),
-                    val = defaults.textarea.value;
-                
+                    val = utils.editor.get();
+
                 if(selection){
-                    
+
                     var tempStart = selection.start;
                     while(tempStart--){
                         if(val.charAt(tempStart)=="\n"){
@@ -192,12 +231,11 @@ var Behave = Behave || function (userOpts) {
                             break;
                         }
                     }
-                    
+
                     var toIndent = val.substring(selection.start, selection.end),
                         lines = toIndent.split("\n"),
                         i;
-                        
-                        
+
                     if(e.shiftKey){
                         for(i in lines){
                             if(lines[i].substring(0,tab.length) == tab){
@@ -205,17 +243,17 @@ var Behave = Behave || function (userOpts) {
                             }
                         }
                         toIndent = lines.join("\n");
-                        
-                        defaults.textarea.value = val.substring(0,selection.start) + toIndent + val.substring(selection.end);
+
+                        utils.editor.set( val.substring(0,selection.start) + toIndent + val.substring(selection.end) );
                         utils.cursor.select(selection.start, selection.start+toIndent.length);
-                        
+
                     } else {
                         for(i in lines){
                             lines[i] = tab + lines[i];
                         }
                         toIndent = lines.join("\n");
-                        
-                        defaults.textarea.value = val.substring(0,selection.start) + toIndent + val.substring(selection.end);
+
+                        utils.editor.set( val.substring(0,selection.start) + toIndent + val.substring(selection.end) );
                         utils.cursor.select(selection.start, selection.start+toIndent.length);
                     }
                 } else {
@@ -226,11 +264,11 @@ var Behave = Behave || function (userOpts) {
                     if(e.shiftKey){
                         if(val.substring(pos-tab.length, pos) == tab){
                             edited = val.substring(0, pos-tab.length) + right;
-                            defaults.textarea.value = edited;
+                            utils.editor.set(edited);
                             utils.cursor.set(pos-tab.length);
                         }
                     } else {
-                        defaults.textarea.value = edited;
+                        utils.editor.set(edited);
                         utils.cursor.set(pos + tab.length);
                         return false;
                     }
@@ -239,12 +277,15 @@ var Behave = Behave || function (userOpts) {
             return true;
         },
         enterKey: function (e) {
+
+            if(!utils.fenceRange()){ return; }
+
             if (e.keyCode == 13) {
 
                 utils.preventDefaultEvent(e);
 
                 var pos = utils.cursor.get(),
-                    val = defaults.textarea.value,
+                    val = utils.editor.get(),
                     left = val.substring(0, pos),
                     right = val.substring(pos),
                     leftChar = left.charAt(left.length - 1),
@@ -262,7 +303,7 @@ var Behave = Behave || function (userOpts) {
                     }
                     ourIndent = ourIndent;
                     finalCursorPos = ourIndent.length + 1;
-                    
+
                     for (i in charSettings.keyMap) {
                         if (charSettings.keyMap[i].open == leftChar && charSettings.keyMap[i].close == rightChar){
                             closingBreak = "\n";
@@ -272,17 +313,20 @@ var Behave = Behave || function (userOpts) {
                 }
 
                 var edited = left + "\n" + ourIndent + closingBreak + (ourIndent.substring(0, ourIndent.length-tab.length) ) + right;
-                defaults.textarea.value = edited;
+                utils.editor.set(edited);
                 utils.cursor.set(pos + finalCursorPos);
             }
         },
         deleteKey: function (e) {
+
+            if(!utils.fenceRange()){ return; }
+
             if(e.keyCode == 8){
 
                 if( utils.cursor.selection() === false ){
 
                     var pos = utils.cursor.get(),
-                        val = defaults.textarea.value,
+                        val = utils.editor.get(),
                         left = val.substring(0, pos),
                         right = val.substring(pos),
                         leftChar = left.charAt(left.length - 1),
@@ -292,7 +336,7 @@ var Behave = Behave || function (userOpts) {
                         if (charSettings.keyMap[i].open == leftChar && charSettings.keyMap[i].close == rightChar) {
                             utils.preventDefaultEvent(e);
                             var edited = val.substring(0,pos-1) + val.substring(pos+1);
-                            defaults.textarea.value = edited;
+                            utils.editor.set(edited);
                             utils.cursor.set(pos - 1);
                         }
                     }
@@ -304,17 +348,17 @@ var Behave = Behave || function (userOpts) {
         openedChar: function (_char, e) {
             utils.preventDefaultEvent(e);
             var pos = utils.cursor.get(),
-                val = defaults.textarea.value,
+                val = utils.editor.get(),
                 left = val.substring(0, pos),
                 right = val.substring(pos),
                 edited = left + _char.open + _char.close + right;
-            
+
             defaults.textarea.value = edited;
             utils.cursor.set(pos + 1);
         },
         closedChar: function (_char, e) {
             var pos = utils.cursor.get(),
-                val = defaults.textarea.value,
+                val = utils.editor.get(),
                 toOverwrite = val.substring(pos, pos + 1);
             if (toOverwrite == _char.close) {
                 utils.preventDefaultEvent(e);
@@ -327,6 +371,8 @@ var Behave = Behave || function (userOpts) {
     action = {
         filter: function (e) {
             
+            if(!utils.fenceRange()){ return; }
+            
             var _char = String.fromCharCode(e.which || e.keyCode),
                 i;
 
@@ -334,7 +380,7 @@ var Behave = Behave || function (userOpts) {
 
                 if (charSettings.keyMap[i].close == _char) {
                     var didClose = defaults.overwrite && charFuncs.closedChar(charSettings.keyMap[i], e);
-                    
+
                     if (!didClose && charSettings.keyMap[i].open == _char && defaults.autoOpen) {
                         charFuncs.openedChar(charSettings.keyMap[i], e);
                     }
@@ -354,10 +400,10 @@ var Behave = Behave || function (userOpts) {
         }
     },
     init = function (opts) {
-        
+
         if(opts.textarea){
             utils.deepExtend(defaults, opts);
-        
+
             if (defaults.softTabs) {
                 tab = " ".repeat(defaults.softTabSize);
             } else {
@@ -368,14 +414,14 @@ var Behave = Behave || function (userOpts) {
         }
         
     };
-    
+
     this.destroy = function(){
         defaults.textarea.removeEventListener('keydown', intercept.tabKey);
         defaults.textarea.removeEventListener('keydown', intercept.enterKey);
         defaults.textarea.removeEventListener('keydown', intercept.deleteKey);
         defaults.textarea.removeEventListener('keypress', action.filter);
     };
-    
+
     init(userOpts);
-    
+
 };
