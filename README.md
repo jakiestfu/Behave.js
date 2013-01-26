@@ -5,12 +5,14 @@
 ## What?
 Behave.js is a lightweight library for adding IDE style behaviors to plain text areas, making it much more enjoyable to write code in.
 * No Dependencies
+* Custom Code/Behavior Fencing
 * Hard and Soft Tabs
 * Auto Open/Close Paranthesis, Brackets, Braces, Double and Single Quotes
 * Auto delete a paired character
 * Overwrite a paired character
 * Multi-line Indentation/Unindentation
 * Automatic Indentation
+* Chrome X+, Firefox X+, Safari X+, IE9+
 
 ## Usage
 ```javascript
@@ -69,6 +71,9 @@ var editor = new Behave({
   </li>
   <li>
     autoIndent : If set to true, automatic indentation of your code will be attempted. Best used with <code>autoOpen</code> set to true 
+  </li>
+  <li>
+    fence : If you do not want to add behaviors to an entire textarea, you may use a fence. A fence is a string, any set of characters you want to denote where behaviors should be added. The format is Fence, New Line, Code, New Line, Fence.
   </li>
 </ul>
 
