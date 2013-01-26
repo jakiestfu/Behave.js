@@ -1,5 +1,7 @@
 <a href="http://jakiestfu.github.com/Behave.js/"><img src="https://raw.github.com/jakiestfu/Behave.js/gh-pages/assets/hero.png"></a>
 
+<a href="https://github.com/jakiestfu/Behave.js/issues/6">***There is only one issue to resolve to add support for IE 7 and 8, read about it here and see if you can help***</a>
+
 ## What?
 Behave.js is a lightweight library for adding IDE style behaviors to plain text areas, making it much more enjoyable to write code in.
 * No Dependencies
