@@ -79,7 +79,7 @@
     textarea: null,
     replaceTab: true,
     softTabs: true,
-    softTabSize: 4,
+    tabSize: 4,
     autoOpen: true,
     overwrite: true,
     autoStrip: true,
@@ -89,10 +89,10 @@
 				
 				<dl class="params">
 				
-					<dt><span>textarea</span></dt>
+					<dt><span>textarea</span> (Element)</dt>
 					<dd><p>Textarea element to apply the behaviors to</p></dd>
 				
-					<dt><span>replaceTab</span></dt>
+					<dt><span>replaceTab</span> (Boolean)</dt>
 					<dd>
 						<p>replaceTab, if set to true, does three different things:</p>
 						<ul>
@@ -102,13 +102,13 @@
 						</ul>
 					</dd>
 				
-					<dt><span>softTabs</span></dt>
+					<dt><span>softTabs</span> (Boolean)</dt>
 					<dd><p>If set to true, spaces will be used instead of a tab character</p></dd>
 				
-					<dt><span>softTabSize</span></dt>
-					<dd><p>If <code>softTabs</code> is set to true, the number of spaces used is defined here</p></dd>
+					<dt><span>tabSize</span> (Int)</dt>
+					<dd><p>If <code>softTabs</code> is set to true, the number of spaces used is defined here. If set to false, the CSS property <code>tab-size</code> will be used to define hard tab sizes.</p></dd>
 				
-					<dt><span>autoOpen</span></dt>
+					<dt><span>autoOpen</span> (Boolean)</dt>
 					<dd>
 						<p>
 							If any of the following characters are typed, their counterparts are automatically added: 
@@ -122,16 +122,16 @@
 						</p>
 					</dd>
 				
-					<dt><span>overwrite</span></dt>
+					<dt><span>overwrite</span> (Boolean)</dt>
 					<dd><p>If you type a closing character directly before an identical character, it will overwrite it instead of adding it. Best used with <code>autoOpen</code> set to true</p></dd>
 				
-					<dt><span>autoStrip</span></dt>
+					<dt><span>autoStrip</span> (Boolean)</dt>
 					<dd><p>If set to true, and your cursor is between two paired characters, pressing backspace will delete both instead of just the first</p></dd>
 				
-					<dt><span>autoIndent</span></dt>
+					<dt><span>autoIndent</span> (Boolean)</dt>
 					<dd><p>If set to true, automatic indentation of your code will be attempted. Best used with <code>autoOpen</code> set to true</p></dd>
 					
-					<dt><span>fence</span></dt>
+					<dt><span>fence</span> (String)</dt>
 					<dd><p>If you do not want to add behaviors to an entire textarea, you may use a fence. A fence is a string, any set of characters you want to denote where behaviors should be added. The format is Fence, New Line, Code, New Line, Fence.</p></dd>
 				
 				</dl>
@@ -211,7 +211,7 @@ No behaviors if typed here</code></pre>
 				textarea: document.getElementById('demo'),
 				replaceTab: 	_val('replaceTab'),
 			    softTabs: 		_val('softTabs'),
-			    softTabSize: 	parseInt( _val('softTabSize') ),
+			    tabSize: 		parseInt( _val('softTabSize') ),
 			    autoOpen: 		_val('autoOpen'),
 			    overwrite: 		_val('overwrite'),
 			    autoStrip: 		_val('autoStrip'),
