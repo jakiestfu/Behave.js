@@ -45,7 +45,7 @@ var Behave = Behave || function (userOpts) {
         textarea: null,
         replaceTab: true,
         softTabs: true,
-        softTabSize: 4,
+        tabSize: 4,
         autoOpen: true,
         overwrite: true,
         autoStrip: true,
@@ -405,9 +405,10 @@ var Behave = Behave || function (userOpts) {
             utils.deepExtend(defaults, opts);
 
             if (defaults.softTabs) {
-                tab = " ".repeat(defaults.softTabSize);
+                tab = " ".repeat(defaults.tabSize);
             } else {
                 tab = "\t";
+                defaults.textarea.style.tabSize = defaults.tabSize;
             }
             
             action.listen();
