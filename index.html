@@ -52,14 +52,17 @@
 			<div>
 				<h1>What?</h1>
 				<p>Behave.js is a lightweight library for adding IDE style behaviors to plain text areas, making it much more enjoyable to write code in.</p>
+				
 				<ul>
 					<li>No Dependencies</li>
+					<li>Custom Code/Behavior Fencing</li>
 					<li>Hard and Soft Tabs</li>
-					<li>Auto Open/Close Paranthesis, Brackets, Braces, Double and Single Quotes</li>
+					<li>Auto Open/Close Parenthesis, Brackets, Braces, Double and Single Quotes</li>
 					<li>Auto delete a paired character</li>
 					<li>Overwrite a paired character</li>
 					<li>Multi-line Indentation/Unindentation</li>
 					<li>Automatic Indentation</li>
+					<li>Chrome X+, Firefox X+, Safari X+, IE9+</li>
 				</ul>
 			</div>
 			
@@ -80,7 +83,8 @@
     autoOpen: true,
     overwrite: true,
     autoStrip: true,
-    autoIndent: true
+    autoIndent: true,
+    fence: false
 });</code></pre>
 				
 				<dl class="params">
@@ -126,9 +130,19 @@
 				
 					<dt><span>autoIndent</span></dt>
 					<dd><p>If set to true, automatic indentation of your code will be attempted. Best used with <code>autoOpen</code> set to true</p></dd>
+					
+					<dt><span>fence</span></dt>
+					<dd><p>If you do not want to add behaviors to an entire textarea, you may use a fence. A fence is a string, any set of characters you want to denote where behaviors should be added. The format is Fence, New Line, Code, New Line, Fence.</p></dd>
 				
 				</dl>
+				<pre><code>Example with fence set to "~~~"
 				
+~~~
+Behaviors Active
+~~~
+
+
+No behaviors if typed here</code></pre>
 			</div>
 			
 			<div>
@@ -151,6 +165,7 @@
 					<label>Overwrite: <input type="checkbox" checked="checked" id="overwrite"></label>
 					<label>Auto Strip: <input type="checkbox" checked="checked" id="autoStrip"></label>
 					<label>Auto Indent: <input type="checkbox" checked="checked" id="autoIndent"></label>
+					<label>Code Fence: <input type="text" id="fence" placeholder="~~~" class="text fence"></label>
 				</div>
 				
 				<textarea id="demo" placeholder="Try writing a javascript function or some CSS"></textarea>
@@ -179,13 +194,20 @@
 	<script type="text/javascript">
 	
 		function _val(id){
-			return id=="softTabSize" ? document.getElementById(id).value : document.getElementById(id).checked;
+			if(id=="softTabSize"){
+				return document.getElementById(id).value;
+			} else if(id=="fence"){
+				return document.getElementById(id).value.length > 0 ? document.getElementById(id).value : false;
+			} else  {
+				return document.getElementById(id).checked;
+			}
 		}
 		
 		function doDemo(focus){
 			if(window.editor){
 				window.editor.destroy();
 			}
+			console.log(_val('fence'));
 			window.editor = new Behave({
 				textarea: document.getElementById('demo'),
 				replaceTab: 	_val('replaceTab'),
@@ -194,7 +216,8 @@
 			    autoOpen: 		_val('autoOpen'),
 			    overwrite: 		_val('overwrite'),
 			    autoStrip: 		_val('autoStrip'),
-			    autoIndent: 	_val('autoIndent')
+			    autoIndent: 	_val('autoIndent'),
+			    fence: 			_val('fence')
 			});
 			if(focus){
 				document.getElementById('demo').focus();

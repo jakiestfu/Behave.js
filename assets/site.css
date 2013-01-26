@@ -126,13 +126,17 @@ dl.params{
 
 .opts label{
 	margin-right:25px;
+	margin-bottom: 10px;
+	display: inline-block;
 	}
 	.opts .text{
 		border: 2px solid #F68F64;
 		width: 25px;
 		text-align: center;
 		}
-
+	.opts .text.fence{
+		width:50px;
+		}
 textarea{
 	margin-top: 30px;
 	border: 2px solid #F68F64;
