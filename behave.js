@@ -66,7 +66,7 @@ var Behave = Behave || function (userOpts) {
     },
     utils = {
         cursor: {
-            get: function doGetCaretPosition() {
+            get: function() {
                 var caretPos = 0;
 
                 if (typeof defaults.textarea.selectionStart === 'number') {
