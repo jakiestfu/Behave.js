@@ -31,7 +31,8 @@ var editor = new Behave({
     autoOpen: true,
     overwrite: true,
     autoStrip: true,
-    autoIndent: true
+    autoIndent: true,
+    fence: false
 });
 ```
 <ul>
