@@ -1,9 +1,8 @@
 <a href="http://jakiestfu.github.com/Behave.js/"><img src="https://raw.github.com/jakiestfu/Behave.js/gh-pages/assets/hero.png"></a>
 
-<a href="https://github.com/jakiestfu/Behave.js/issues/6">***There is only one issue to resolve to add support for IE 7 and 8, read about it here and see if you can help***</a>
-
 ## What?
 Behave.js is a lightweight library for adding IDE style behaviors to plain text areas, making it much more enjoyable to write code in.
+* Supports IE7+
 * No Dependencies
 * Custom Code/Behavior Fencing
 * Hard and Soft Tabs
@@ -27,7 +26,7 @@ var editor = new Behave({
     textarea: null,
     replaceTab: true,
     softTabs: true,
-    softTabSize: 4,
+    tabSize: 4,
     autoOpen: true,
     overwrite: true,
     autoStrip: true,
@@ -52,7 +51,7 @@ var editor = new Behave({
     softTabs : If set to true, spaces will be used instead of a tab character
   </li>
   <li>
-    softTabSize : If <code>softTabs</code> is set to true, the number of spaces used is defined here
+    tabSize : If <code>softTabs</code> is set to true, the number of spaces used is defined here. If set to false, the CSS property tab-size will be used to define hard tab sizes.
   </li>
   <li>
     autoOpen : If any of the following characters are typed, their counterparts are automatically added:  
