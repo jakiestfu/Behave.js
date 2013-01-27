@@ -86,9 +86,6 @@ editor.destroy();
   <li>destroy : Removes all event listeners from your textarea</li>
 </ul>
 
-## ToDo
-* Add support for IE
-* Add multi-line indentation
 
 ## License 
 **MIT Licensing**
