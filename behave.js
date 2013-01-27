@@ -2,7 +2,6 @@ var Behave = Behave || function (userOpts) {
 
     'use strict';
 
-    // Fast repeat, uses the `Exponentiation by squaring` algorithm.
     if (typeof String.prototype.repeat !== 'function') {
         String.prototype.repeat = function(times) {
             if (times < 1){
@@ -18,7 +17,7 @@ var Behave = Behave || function (userOpts) {
 
     if (typeof Array.prototype.filter !== 'function') {
         Array.prototype.filter = function(func /*, thisp */) {
-            if (this == null) {
+            if (this === null) {
                 throw new TypeError();
             }
 
@@ -53,6 +52,7 @@ var Behave = Behave || function (userOpts) {
         fence: false
     },
     tab,
+    newLine,
     charSettings = {
 
         keyMap: [
@@ -61,54 +61,105 @@ var Behave = Behave || function (userOpts) {
             { open: "(", close: ")", canBreak: false },
             { open: "[", close: "]", canBreak: true },
             { open: "{", close: "}", canBreak: true }
-        ] 
+        ]
 
     },
     utils = {
+        defineNewLine: function(){
+            var ta = document.createElement('textarea');
+            ta.value = "\n";
+            
+            if(ta.value.length==2){
+                newLine = "\r\n";
+            } else {
+                newLine = "\n";
+            }
+        },
         cursor: {
             get: function() {
-                var caretPos = 0;
 
-                if (typeof defaults.textarea.selectionStart === 'number') {
-                    caretPos = defaults.textarea.selectionStart;
+                if (typeof document.createElement('textarea').selectionStart==="number") {
+                    return defaults.textarea.selectionStart;
                 } else if (document.selection) {
-                    defaults.textarea.focus();
-                    var selection = document.selection.createRange();
+                    var caretPos = 0,
+                        range = defaults.textarea.createTextRange(),
+                        rangeDupe = document.selection.createRange().duplicate(),
+                        rangeDupeBookmark = rangeDupe.getBookmark();
+                    range.moveToBookmark(rangeDupeBookmark);
 
-                    selection.moveStart('character', -defaults.textarea.value.length);
-                    caretPos = selection.text.length;
+                    while (range.moveStart('character' , -1) !== 0) {
+                        caretPos++;
+                    }
+                    return caretPos;
                 }
-                return caretPos;
             },
-            set: function (pos) {
+            set: function (start, end) {
+                if(!end){
+                    end = start;
+                }
                 if (defaults.textarea.setSelectionRange) {
                     defaults.textarea.focus();
-                    defaults.textarea.setSelectionRange(pos, pos);
+                    defaults.textarea.setSelectionRange(start, end);
                 } else if (defaults.textarea.createTextRange) {
                     var range = defaults.textarea.createTextRange();
                     range.collapse(true);
-                    range.moveEnd('character', pos);
-                    range.moveStart('character', pos);
+                    range.moveEnd('character', end);
+                    range.moveStart('character', start);
                     range.select();
                 }
             },
-            select: function(start, end){
-                defaults.textarea.selectionStart = start;
-                defaults.textarea.selectionEnd = end;
-            },
             selection: function(){
-                var start = defaults.textarea.selectionStart,
-                    end = defaults.textarea.selectionEnd;
-                    
-                return  start != end ? {
-                    start: defaults.textarea.selectionStart,
-                    end: defaults.textarea.selectionEnd
-                } : false;
+                var textAreaElement = defaults.textarea,
+                    start = 0, 
+                    end = 0, 
+                    normalizedValue, 
+                    range,
+                    textInputRange, 
+                    len, 
+                    endRange;
+
+                if (typeof textAreaElement.selectionStart == "number" && typeof textAreaElement.selectionEnd == "number") {
+                    start = textAreaElement.selectionStart;
+                    end = textAreaElement.selectionEnd;
+                } else {
+                    range = document.selection.createRange();
+            
+                    if (range && range.parentElement() == textAreaElement) {
+                        
+                        normalizedValue = utils.editor.get();
+                        len = normalizedValue.length;
+                        
+                        textInputRange = textAreaElement.createTextRange();
+                        textInputRange.moveToBookmark(range.getBookmark());
+            
+                        endRange = textAreaElement.createTextRange();
+                        endRange.collapse(false);
+            
+                        if (textInputRange.compareEndPoints("StartToEnd", endRange) > -1) {
+                            start = end = len;
+                        } else {
+                            start = -textInputRange.moveStart("character", -len);
+                            start += normalizedValue.slice(0, start).split(newLine).length - 1;
+            
+                            if (textInputRange.compareEndPoints("EndToEnd", endRange) > -1) {
+                                end = len;
+                            } else {
+                                end = -textInputRange.moveEnd("character", -len);
+                                end += normalizedValue.slice(0, end).split(newLine).length - 1;
+                            }
+                        }
+                    }
+                }
+    
+                return start==end ? false : {
+                    start: start,
+                    end: end
+                };
             }
         },
         editor: {
             get: function(){
-                return defaults.textarea.value;
+                return defaults.textarea.value.replace(/\r/g,'');
             },
             set: function(data){
                 defaults.textarea.value = data;
@@ -148,7 +199,7 @@ var Behave = Behave || function (userOpts) {
         },
         levelsDeep: function(){
             var pos = utils.cursor.get(),
-                val = defaults.textarea.value;
+                val = utils.editor.get();
 
             var left = val.substring(0, pos),
                 levels = 0,
@@ -168,7 +219,6 @@ var Behave = Behave || function (userOpts) {
                 }
             }
 
-            // Remove cases of quote-enclosed break characters
             var toDecrement = 0,
                 quoteMap = ["'", "\""];
             for(i in charSettings.keyMap){
@@ -180,7 +230,7 @@ var Behave = Behave || function (userOpts) {
             }
 
             var finalLevels = levels - toDecrement;
-
+            
             return finalLevels >=0 ? finalLevels : 0;
         },
         deepExtend: function(destination, source) {
@@ -223,7 +273,7 @@ var Behave = Behave || function (userOpts) {
                     val = utils.editor.get();
 
                 if(selection){
-
+                    
                     var tempStart = selection.start;
                     while(tempStart--){
                         if(val.charAt(tempStart)=="\n"){
@@ -237,15 +287,15 @@ var Behave = Behave || function (userOpts) {
                         i;
 
                     if(e.shiftKey){
-                        for(i in lines){
+                        for(i = 0; i<lines.length; i++){
                             if(lines[i].substring(0,tab.length) == tab){
                                 lines[i] = lines[i].substring(tab.length);
                             }
                         }
                         toIndent = lines.join("\n");
-
+                        
                         utils.editor.set( val.substring(0,selection.start) + toIndent + val.substring(selection.end) );
-                        utils.cursor.select(selection.start, selection.start+toIndent.length);
+                        utils.cursor.set(selection.start, selection.start+toIndent.length);
 
                     } else {
                         for(i in lines){
@@ -254,7 +304,7 @@ var Behave = Behave || function (userOpts) {
                         toIndent = lines.join("\n");
 
                         utils.editor.set( val.substring(0,selection.start) + toIndent + val.substring(selection.end) );
-                        utils.cursor.select(selection.start, selection.start+toIndent.length);
+                        utils.cursor.set(selection.start, selection.start+toIndent.length);
                     }
                 } else {
                     var left = val.substring(0, pos),
@@ -306,13 +356,13 @@ var Behave = Behave || function (userOpts) {
 
                     for (i in charSettings.keyMap) {
                         if (charSettings.keyMap[i].open == leftChar && charSettings.keyMap[i].close == rightChar){
-                            closingBreak = "\n";
+                            closingBreak = newLine;
                         }
-                    } 
+                    }
                     
                 }
 
-                var edited = left + "\n" + ourIndent + closingBreak + (ourIndent.substring(0, ourIndent.length-tab.length) ) + right;
+                var edited = left + newLine + ourIndent + closingBreak + (ourIndent.substring(0, ourIndent.length-tab.length) ) + right;
                 utils.editor.set(edited);
                 utils.cursor.set(pos + finalCursorPos);
             }
@@ -322,9 +372,7 @@ var Behave = Behave || function (userOpts) {
             if(!utils.fenceRange()){ return; }
 
             if(e.keyCode == 8){
-
                 if( utils.cursor.selection() === false ){
-
                     var pos = utils.cursor.get(),
                         val = utils.editor.get(),
                         left = val.substring(0, pos),
@@ -370,9 +418,9 @@ var Behave = Behave || function (userOpts) {
     },
     action = {
         filter: function (e) {
-            
+
             if(!utils.fenceRange()){ return; }
-            
+
             var _char = String.fromCharCode(e.which || e.keyCode),
                 i;
 
@@ -388,7 +436,6 @@ var Behave = Behave || function (userOpts) {
                     charFuncs.openedChar(charSettings.keyMap[i], e);
                 }
             }
-            
         },
         listen: function () {
 
@@ -403,6 +450,7 @@ var Behave = Behave || function (userOpts) {
 
         if(opts.textarea){
             utils.deepExtend(defaults, opts);
+            utils.defineNewLine();
 
             if (defaults.softTabs) {
                 tab = " ".repeat(defaults.tabSize);
@@ -410,10 +458,10 @@ var Behave = Behave || function (userOpts) {
                 tab = "\t";
                 defaults.textarea.style.tabSize = defaults.tabSize;
             }
-            
+
             action.listen();
         }
-        
+
     };
 
     this.destroy = function(){
