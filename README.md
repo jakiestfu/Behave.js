@@ -2,7 +2,7 @@
 
 ## What?
 Behave.js is a lightweight library for adding IDE style behaviors to plain text areas, making it much more enjoyable to write code in.
-* Supports IE7+
+* <a href="http://www.youtube.com/watch?v=F1lJFlB-89Q" target="_blank">Supports IE7+ (Does that make you randy?)</a>
 * No Dependencies
 * Custom Code/Behavior Fencing
 * Hard and Soft Tabs
