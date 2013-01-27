@@ -51,11 +51,13 @@ header, footer{
 	margin-top:80px;
 	z-index:3;
 	}
+	a{
+		color:#F68F64;
+		text-decoration:none;
+	}
 	header a, footer a{
-		color:#f68f64;
 		font-weight:bold;
 		text-shadow: 3px 3px #fff, 3px -3px #fff, -3px -3px #fff, -3px 3px #fff;
-		text-decoration:none;
 		}
 	footer{
 		font-size: 80px;
