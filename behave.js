@@ -421,7 +421,11 @@ var Behave = Behave || function (userOpts) {
 
             if(!utils.fenceRange()){ return; }
 
-            var _char = String.fromCharCode(e.which || e.keyCode),
+            var theCode = e.which || e.keyCode;
+            
+            if(theCode == 39 || theCode == 40){ return; }
+
+            var _char = String.fromCharCode(theCode),
                 i;
 
             for (i in charSettings.keyMap) {
