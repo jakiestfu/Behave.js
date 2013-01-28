@@ -423,7 +423,7 @@ var Behave = Behave || function (userOpts) {
 
             var theCode = e.which || e.keyCode;
             
-            if(theCode == 39 || theCode == 40){ return; }
+            if(theCode == 39 || theCode == 40 && e.which===0){ return; }
 
             var _char = String.fromCharCode(theCode),
                 i;
