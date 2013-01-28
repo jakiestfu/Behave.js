@@ -221,7 +221,7 @@ var Behave = Behave || function (userOpts) {
 
             var toDecrement = 0,
                 quoteMap = ["'", "\""];
-            for(i in charSettings.keyMap){
+            for(i=0; i<charSettings.keyMap.length; i++) {
                 if(charSettings.keyMap[i].canBreak){
                     for(j in quoteMap){
                         toDecrement += left.split(quoteMap[j]).filter(utils.isEven).join('').split(charSettings.keyMap[i].open).length - 1;
@@ -354,7 +354,7 @@ var Behave = Behave || function (userOpts) {
                     ourIndent = ourIndent;
                     finalCursorPos = ourIndent.length + 1;
 
-                    for (i in charSettings.keyMap) {
+                    for(i=0; i<charSettings.keyMap.length; i++) {
                         if (charSettings.keyMap[i].open == leftChar && charSettings.keyMap[i].close == rightChar){
                             closingBreak = newLine;
                         }
@@ -380,7 +380,7 @@ var Behave = Behave || function (userOpts) {
                         leftChar = left.charAt(left.length - 1),
                         rightChar = right.charAt(0),
                         i;
-                    for (i in charSettings.keyMap) {
+                    for(i=0; i<charSettings.keyMap.length; i++) {
                         if (charSettings.keyMap[i].open == leftChar && charSettings.keyMap[i].close == rightChar) {
                             utils.preventDefaultEvent(e);
                             var edited = val.substring(0,pos-1) + val.substring(pos+1);
@@ -428,7 +428,7 @@ var Behave = Behave || function (userOpts) {
             var _char = String.fromCharCode(theCode),
                 i;
 
-            for (i in charSettings.keyMap) {
+            for(i=0; i<charSettings.keyMap.length; i++) {
 
                 if (charSettings.keyMap[i].close == _char) {
                     var didClose = defaults.overwrite && charFuncs.closedChar(charSettings.keyMap[i], e);
