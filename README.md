@@ -2,7 +2,7 @@
 
 ## What?
 Behave.js is a lightweight library for adding IDE style behaviors to plain text areas, making it much more enjoyable to write code in.
-* <a href="http://www.youtube.com/watch?v=F1lJFlB-89Q" target="_blank">Supports IE7+ (Does that make you randy?)</a>
+* Supports <a href="http://www.youtube.com/watch?v=F1lJFlB-89Q" target="_blank">Partial IE6, IE7+, Firefox 8+, Safari 4+, Chrome X+, Opera 12</a>
 * No Dependencies
 * Custom Code/Behavior Fencing
 * Hard and Soft Tabs
@@ -11,7 +11,6 @@ Behave.js is a lightweight library for adding IDE style behaviors to plain text 
 * Overwrite a paired character
 * Multi-line Indentation/Unindentation
 * Automatic Indentation
-* Chrome X+, Firefox 8+, Safari X+, IE7+
 
 ## Usage
 ```javascript
