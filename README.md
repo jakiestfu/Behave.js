@@ -11,7 +11,7 @@ Behave.js is a lightweight library for adding IDE style behaviors to plain text 
 * Overwrite a paired character
 * Multi-line Indentation/Unindentation
 * Automatic Indentation
-* Chrome X+, Firefox X+, Safari X+, IE9+
+* Chrome X+, Firefox 8+, Safari X+, IE7+
 
 ## Usage
 ```javascript
