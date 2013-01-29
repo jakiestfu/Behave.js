@@ -75,6 +75,17 @@ var Behave = Behave || function (userOpts) {
                 newLine = "\n";
             }
         },
+        defineTabSize: function(tabSize){
+	        if(typeof defaults.textarea.style.OTabSize != "undefined"){ 
+	        	defaults.textarea.style.OTabSize = tabSize; return;
+	        }
+	        if(typeof defaults.textarea.style.MozTabSize != "undefined"){ 
+	        	defaults.textarea.style.MozTabSize = tabSize; return;
+	        }
+	        if(typeof defaults.textarea.style.tabSize != "undefined"){ 
+	        	defaults.textarea.style.tabSize = tabSize; return;
+	        }
+        },
         cursor: {
             get: function() {
 
@@ -460,7 +471,8 @@ var Behave = Behave || function (userOpts) {
                 tab = " ".repeat(defaults.tabSize);
             } else {
                 tab = "\t";
-                defaults.textarea.style.tabSize = defaults.tabSize;
+                
+                utils.defineTabSize(defaults.tabSize);
             }
 
             action.listen();
