@@ -1,9 +1,9 @@
 (function(undefined){
+
+    'use strict';
     
     var Behave = Behave || function (userOpts) {
-    
-        'use strict';
-    
+
         if (typeof String.prototype.repeat !== 'function') {
             String.prototype.repeat = function(times) {
                 if(times < 1){
@@ -16,13 +16,13 @@
                 return half + half;
             };
         }
-    
+
         if (typeof Array.prototype.filter !== 'function') {
             Array.prototype.filter = function(func /*, thisp */) {
                 if (this === null) {
                     throw new TypeError();
                 }
-    
+
                 var t = Object(this),
                     len = t.length >>> 0;
                 if (typeof func != "function"){
@@ -41,7 +41,7 @@
                 return res;
             };
         }
-    
+
         var defaults = {
             textarea: null,
             replaceTab: true,
@@ -56,7 +56,7 @@
         tab,
         newLine,
         charSettings = {
-    
+
             keyMap: [
                 { open: "\"", close: "\"", canBreak: false },
                 { open: "'", close: "'", canBreak: false },
@@ -64,7 +64,7 @@
                 { open: "[", close: "]", canBreak: true },
                 { open: "{", close: "}", canBreak: true }
             ]
-    
+
         },
         utils = {
             defineNewLine: function(){
@@ -90,7 +90,7 @@
             },
             cursor: {
                 get: function() {
-    
+
                     if (typeof document.createElement('textarea').selectionStart==="number") {
                         return defaults.textarea.selectionStart;
                     } else if (document.selection) {
@@ -99,7 +99,7 @@
                             rangeDupe = document.selection.createRange().duplicate(),
                             rangeDupeBookmark = rangeDupe.getBookmark();
                         range.moveToBookmark(rangeDupeBookmark);
-    
+
                         while (range.moveStart('character' , -1) !== 0) {
                             caretPos++;
                         }
@@ -130,13 +130,13 @@
                         textInputRange, 
                         len, 
                         endRange;
-    
+
                     if (typeof textAreaElement.selectionStart == "number" && typeof textAreaElement.selectionEnd == "number") {
                         start = textAreaElement.selectionStart;
                         end = textAreaElement.selectionEnd;
                     } else {
                         range = document.selection.createRange();
-                
+
                         if (range && range.parentElement() == textAreaElement) {
                             
                             normalizedValue = utils.editor.get();
@@ -144,16 +144,16 @@
                             
                             textInputRange = textAreaElement.createTextRange();
                             textInputRange.moveToBookmark(range.getBookmark());
-                
+
                             endRange = textAreaElement.createTextRange();
                             endRange.collapse(false);
-                
+
                             if (textInputRange.compareEndPoints("StartToEnd", endRange) > -1) {
                                 start = end = len;
                             } else {
                                 start = -textInputRange.moveStart("character", -len);
                                 start += normalizedValue.slice(0, start).split(newLine).length - 1;
-                
+
                                 if (textInputRange.compareEndPoints("EndToEnd", endRange) > -1) {
                                     end = len;
                                 } else {
@@ -163,7 +163,7 @@
                             }
                         }
                     }
-        
+
                     return start==end ? false : {
                         start: start,
                         end: end
@@ -180,25 +180,25 @@
             },
             fenceRange: function(){
                 if(typeof defaults.fence == "string"){
-    
+
                     var data = utils.editor.get(),
                         pos = utils.cursor.get(),
                         hacked = 0,
                         matchedFence = data.indexOf(defaults.fence),
                         matchCase = 0;
-    
+
                     while(matchedFence>=0){
                         matchCase++;
                         if( pos < (matchedFence+hacked) ){
                             break;
                         }
-    
+
                         hacked += matchedFence+defaults.fence.length;
                         data = data.substring(matchedFence+defaults.fence.length);
                         matchedFence = data.indexOf(defaults.fence);
-    
+
                     }
-    
+
                     if( (hacked) < pos && ( (matchedFence+hacked) > pos ) && matchCase%2===0){
                         return true;
                     }
@@ -213,25 +213,25 @@
             levelsDeep: function(){
                 var pos = utils.cursor.get(),
                     val = utils.editor.get();
-    
+
                 var left = val.substring(0, pos),
                     levels = 0,
                     i, j;
-    
+
                 for(i=0; i<left.length; i++){
                     for (j=0; j<charSettings.keyMap.length; j++) {
                         if(charSettings.keyMap[j].canBreak){
                             if(charSettings.keyMap[j].open == left.charAt(i)){
                                 levels++;
                             }
-    
+
                             if(charSettings.keyMap[j].close == left.charAt(i)){
                                 levels--;
                             }
                         }
                     }
                 }
-    
+
                 var toDecrement = 0,
                     quoteMap = ["'", "\""];
                 for(i=0; i<charSettings.keyMap.length; i++) {
@@ -241,7 +241,7 @@
                         }
                     }
                 }
-    
+
                 var finalLevels = levels - toDecrement;
                 
                 return finalLevels >=0 ? finalLevels : 0;
@@ -275,16 +275,16 @@
         },
         intercept = {
             tabKey: function (e) {
-    
+
                 if(!utils.fenceRange()){ return; }
-    
+
                 if (e.keyCode == 9) {
                     utils.preventDefaultEvent(e);
-    
+
                     var selection = utils.cursor.selection(),
                         pos = utils.cursor.get(),
                         val = utils.editor.get();
-    
+
                     if(selection){
                         
                         var tempStart = selection.start;
@@ -294,11 +294,11 @@
                                 break;
                             }
                         }
-    
+
                         var toIndent = val.substring(selection.start, selection.end),
                             lines = toIndent.split("\n"),
                             i;
-    
+
                         if(e.shiftKey){
                             for(i = 0; i<lines.length; i++){
                                 if(lines[i].substring(0,tab.length) == tab){
@@ -309,13 +309,13 @@
                             
                             utils.editor.set( val.substring(0,selection.start) + toIndent + val.substring(selection.end) );
                             utils.cursor.set(selection.start, selection.start+toIndent.length);
-    
+
                         } else {
                             for(i in lines){
                                 lines[i] = tab + lines[i];
                             }
                             toIndent = lines.join("\n");
-    
+
                             utils.editor.set( val.substring(0,selection.start) + toIndent + val.substring(selection.end) );
                             utils.cursor.set(selection.start, selection.start+toIndent.length);
                         }
@@ -323,7 +323,7 @@
                         var left = val.substring(0, pos),
                             right = val.substring(pos),
                             edited = left + tab + right;
-    
+
                         if(e.shiftKey){
                             if(val.substring(pos-tab.length, pos) == tab){
                                 edited = val.substring(0, pos-tab.length) + right;
@@ -340,13 +340,13 @@
                 return true;
             },
             enterKey: function (e) {
-    
+
                 if(!utils.fenceRange()){ return; }
-    
+
                 if (e.keyCode == 13) {
-    
+
                     utils.preventDefaultEvent(e);
-    
+
                     var pos = utils.cursor.get(),
                         val = utils.editor.get(),
                         left = val.substring(0, pos),
@@ -366,7 +366,7 @@
                         }
                         ourIndent = ourIndent;
                         finalCursorPos = ourIndent.length + 1;
-    
+
                         for(i=0; i<charSettings.keyMap.length; i++) {
                             if (charSettings.keyMap[i].open == leftChar && charSettings.keyMap[i].close == rightChar){
                                 closingBreak = newLine;
@@ -374,16 +374,16 @@
                         }
                         
                     }
-    
+
                     var edited = left + newLine + ourIndent + closingBreak + (ourIndent.substring(0, ourIndent.length-tab.length) ) + right;
                     utils.editor.set(edited);
                     utils.cursor.set(pos + finalCursorPos);
                 }
             },
             deleteKey: function (e) {
-    
+
                 if(!utils.fenceRange()){ return; }
-    
+
                 if(e.keyCode == 8){
                     if( utils.cursor.selection() === false ){
                         var pos = utils.cursor.get(),
@@ -413,7 +413,7 @@
                     left = val.substring(0, pos),
                     right = val.substring(pos),
                     edited = left + _char.open + _char.close + right;
-    
+
                 defaults.textarea.value = edited;
                 utils.cursor.set(pos + 1);
             },
@@ -431,21 +431,21 @@
         },
         action = {
             filter: function (e) {
-    
+
                 if(!utils.fenceRange()){ return; }
-    
+
                 var theCode = e.which || e.keyCode;
                 
                 if(theCode == 39 || theCode == 40 && e.which===0){ return; }
-    
+
                 var _char = String.fromCharCode(theCode),
                     i;
-    
+
                 for(i=0; i<charSettings.keyMap.length; i++) {
-    
+
                     if (charSettings.keyMap[i].close == _char) {
                         var didClose = defaults.overwrite && charFuncs.closedChar(charSettings.keyMap[i], e);
-    
+
                         if (!didClose && charSettings.keyMap[i].open == _char && defaults.autoOpen) {
                             charFuncs.openedChar(charSettings.keyMap[i], e);
                         }
@@ -455,55 +455,56 @@
                 }
             },
             listen: function () {
-    
+
                 if(defaults.replaceTab){ utils.addEvent(defaults.textarea, 'keydown', intercept.tabKey); }
                 if(defaults.autoIndent){ utils.addEvent(defaults.textarea, 'keydown', intercept.enterKey); }
                 if(defaults.autoStrip){ utils.addEvent(defaults.textarea, 'keydown', intercept.deleteKey); }
-    
+
                 utils.addEvent(defaults.textarea, 'keypress', action.filter);
             }
         },
         init = function (opts) {
-    
+
             if(opts.textarea){
                 utils.deepExtend(defaults, opts);
                 utils.defineNewLine();
-    
+
                 if (defaults.softTabs) {
                     tab = " ".repeat(defaults.tabSize);
                 } else {
                     tab = "\t";
-                    
+
                     utils.defineTabSize(defaults.tabSize);
                 }
-    
+
                 action.listen();
             }
-    
+
         };
-    
+
         this.destroy = function(){
             defaults.textarea.removeEventListener('keydown', intercept.tabKey);
             defaults.textarea.removeEventListener('keydown', intercept.enterKey);
             defaults.textarea.removeEventListener('keydown', intercept.deleteKey);
             defaults.textarea.removeEventListener('keypress', action.filter);
         };
-    
+
         init(userOpts);
-    
+
     };
-    
+
     if (typeof module !== 'undefined' && module.exports) {
         module.exports = Behave;
     }
-    
+
     if (typeof ender === 'undefined') {
         this.Behave = Behave;
     }
-    
+
     if (typeof define === "function" && define.amd) {
         define("behave", [], function () { 
             return Behave; 
         });
     }
+
 }).call(this);
