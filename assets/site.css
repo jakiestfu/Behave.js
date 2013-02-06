@@ -147,7 +147,8 @@ textarea{
 	font-family: monospace;
 	min-height: 200px;
 	}
-	textarea:focus{
+	textarea:focus,
+	.gif{
 		border-color:#A4C293;
 		outline:none;
 	}
