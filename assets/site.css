@@ -149,7 +149,7 @@ textarea{
 	}
 	textarea:focus,
 	.gif{
-		border-color:#A4C293;
+		border:2px solid #A4C293;
 		outline:none;
 	}
 
