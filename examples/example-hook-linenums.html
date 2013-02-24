@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>Behave</title>
+  
+	<style type='text/css'>
+		
+		body{
+			text-align:center;
+			padding:50px;
+		}
+		
+		textarea{
+			width:400px;
+			
+			/* The following three rules make a difference in the script */
+			overflow:hidden;
+			line-height: 13px;
+			font-size: 13px;
+			
+			
+			border:1px solid #999;
+			padding:10px;
+			font-family: monospace;
+			margin:0;
+			display:block;
+			outline:none;
+			}
+			textarea:focus{
+				border-color:#333;
+			}
+		.container{
+			position:relative;
+			display:inline-block;
+			}
+			.line-nums{
+				font-size:13px;
+				line-height:13px;
+				padding:10px 4px;
+				font-family: monospace;
+				background: #EEE;
+				position: absolute;
+				width: 20px;
+				left: -28px;
+				bottom: 0;
+				top: 0;
+				text-align:right;
+				}
+	</style>
+</head>
+<body>
+	
+	<h1>Autosize + Line Numbers Hook</h1>
+	
+	<div class="container">
+		<div class="line-nums"><span>1</span></div>
+		<textarea id="demo"></textarea>
+	</div>
+	
+	<script type='text/javascript' src="../behave.js"></script>
+	<script type="text/javascript">
+	
+		window.onload = function(){
+			
+			/*
+			 * This hook adds autosizing functionality
+			 * to your textarea
+			 */
+			BehaveHooks.add(['keydown'], function(data){
+				var numLines = data.lines.total,
+					fontSize = parseInt( getComputedStyle(data.editor.element)['font-size'] ),
+					padding = parseInt( getComputedStyle(data.editor.element)['padding'] );
+				data.editor.element.style.height = (((numLines*fontSize)+padding))+'px';
+			});
+			
+			/*
+			 * This hook adds Line Number Functionality
+			 */
+			BehaveHooks.add(['keydown'], function(data){
+				var numLines = data.lines.total,
+					house = document.getElementsByClassName('line-nums')[0],
+					html = '',
+					i;
+				for(i=0; i<numLines; i++){
+					html += '<div>'+(i+1)+'</div>';
+				}
+				house.innerHTML = html;
+			});
+			
+			var editor = new Behave({
+			
+				textarea: 		document.getElementById('demo'),
+				replaceTab: 	true,
+			    softTabs: 		true,
+			    tabSize: 		4,
+			    autoOpen: 		true,
+			    overwrite: 		true,
+			    autoStrip: 		true,
+			    autoIndent: 	true
+			});
+			
+		};
+	</script>
+</body>
+</html>

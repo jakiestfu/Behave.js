@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>Behave</title>
+  
+	<style type='text/css'>
+		
+		body{
+			text-align:center;
+			padding:50px;
+		}
+		
+		textarea{
+			width:400px;
+			height:300px;
+			border:1px solid #999;
+			padding:10px;
+			font-family: monospace;
+			font-size:13px;
+			}
+			textarea:focus{
+				border-color:#333;
+			}
+	</style>
+</head>
+<body>
+	
+	<h1>Example</h1>
+	
+	<textarea id="demo"></textarea>
+	
+	<script type='text/javascript' src="../behave.js"></script>
+	<script type="text/javascript">
+	
+		window.onload = function(){
+		
+			var editor = new Behave({
+			
+				textarea: 		document.getElementById('demo'),
+				replaceTab: 	true,
+			    softTabs: 		true,
+			    tabSize: 		4,
+			    autoOpen: 		true,
+			    overwrite: 		true,
+			    autoStrip: 		true,
+			    autoIndent: 	true
+			});
+			
+		};
+	</script>
+</body>
+</html>

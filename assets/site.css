@@ -189,6 +189,10 @@ h1, h2, h3{
 	display: inline-block;
 	text-align: center;
 	}
+hr{
+	border:none;
+	border-bottom:1px dashed #F68F64;
+}
 @media screen and (max-height: 889px) {
 	
 	#austin{
