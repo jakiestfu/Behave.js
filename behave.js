@@ -2,7 +2,36 @@
 
     'use strict';
     
-    var Behave = Behave || function (userOpts) {
+    var BehaveHooks = BehaveHooks || (function(){
+		var hooks = {};
+		
+		return {
+		    add: function(hookName, fn){
+			    if(typeof hookName == "object"){
+			    	var i;
+			    	for(i=0; i<hookName.length; i++){
+				    	var theHook = hookName[i];
+				    	if(!hooks[theHook]){
+					    	hooks[theHook] = [];
+				    	}
+				    	hooks[theHook].push(fn);
+			    	}
+			    } else {
+				    if(!hooks[hookName]){
+				    	hooks[hookName] = [];
+			    	}
+			    	hooks[hookName].push(fn);
+			    }
+		    },
+		    get: function(hookName){
+			    if(hooks[hookName]){
+			    	return hooks[hookName];
+		    	}
+		    }
+	    };
+	    
+	})(),
+	Behave = Behave || function (userOpts) {
 
         if (typeof String.prototype.repeat !== 'function') {
             String.prototype.repeat = function(times) {
@@ -67,6 +96,42 @@
 
         },
         utils = {
+        	
+        	_callHook: function(hookName, passData){
+    			var hooks = BehaveHooks.get(hookName);
+	    		passData = typeof passData=="boolean" && passData === false ? false : true;
+	    		
+	    		if(hooks){
+			    	if(passData){
+				    	var theEditor = defaults.textarea,
+				    		textVal = theEditor.value,
+				    		caretPos = utils.cursor.get(),
+				    		i;
+				    	
+				    	for(i=0; i<hooks.length; i++){
+					    	hooks[i].call(undefined, {
+					    		editor: {
+						    		element: theEditor,
+						    		text: textVal,
+						    		levelsDeep: utils.levelsDeep()
+					    		},
+						    	caret: {
+							    	pos: caretPos
+						    	},
+						    	lines: {
+							    	current: utils.cursor.getLine(textVal, caretPos),
+							    	total: utils.editor.getLines(textVal)
+						    	}
+					    	});
+				    	}
+			    	} else {
+				    	for(i=0; i<hooks.length; i++){
+				    		hooks[i].call(undefined);
+				    	}
+			    	}
+		    	}
+	    	},
+        	
             defineNewLine: function(){
                 var ta = document.createElement('textarea');
                 ta.value = "\n";
@@ -89,7 +154,10 @@
                 }
             },
             cursor: {
-                get: function() {
+	            getLine: function(textVal, pos){
+		        	return ((textVal.substring(0,pos)).split("\n")).length;
+	        	},
+	            get: function() {
 
                     if (typeof document.createElement('textarea').selectionStart==="number") {
                         return defaults.textarea.selectionStart;
@@ -171,7 +239,10 @@
                 }
             },
             editor: {
-                get: function(){
+                getLines: function(textVal){
+		        	return (textVal).split("\n").length;
+	        	},
+	            get: function(){
                     return defaults.textarea.value.replace(/\r/g,'');
                 },
                 set: function(data){
@@ -265,6 +336,14 @@
                     element.attachEvent("on"+eventName, func);
                 }
             },
+            removeEvent: function addEvent(element, eventName, func){
+	            if (element.addEventListener){
+	                element.removeEventListener(eventName,func,false);
+	            } else if (element.attachEvent) {
+	                element.detachEvent("on"+eventName, func);
+	            }
+	        },
+	        
             preventDefaultEvent: function(e){
                 if(e.preventDefault){
                     e.preventDefault();
@@ -280,7 +359,10 @@
 
                 if (e.keyCode == 9) {
                     utils.preventDefaultEvent(e);
-
+                    
+                    var toReturn = true;
+                    utils._callHook('tab:before');
+                    
                     var selection = utils.cursor.selection(),
                         pos = utils.cursor.get(),
                         val = utils.editor.get();
@@ -333,11 +415,12 @@
                         } else {
                             utils.editor.set(edited);
                             utils.cursor.set(pos + tab.length);
-                            return false;
+                            toReturn = false;
                         }
                     }
+                    utils._callHook('tab:after');
                 }
-                return true;
+                return toReturn;
             },
             enterKey: function (e) {
 
@@ -346,7 +429,8 @@
                 if (e.keyCode == 13) {
 
                     utils.preventDefaultEvent(e);
-
+                    utils._callHook('enter:before');
+                    
                     var pos = utils.cursor.get(),
                         val = utils.editor.get(),
                         left = val.substring(0, pos),
@@ -378,36 +462,54 @@
                     var edited = left + newLine + ourIndent + closingBreak + (ourIndent.substring(0, ourIndent.length-tab.length) ) + right;
                     utils.editor.set(edited);
                     utils.cursor.set(pos + finalCursorPos);
+                    utils._callHook('enter:after');
                 }
             },
             deleteKey: function (e) {
 
-                if(!utils.fenceRange()){ return; }
-
-                if(e.keyCode == 8){
-                    if( utils.cursor.selection() === false ){
-                        var pos = utils.cursor.get(),
-                            val = utils.editor.get(),
-                            left = val.substring(0, pos),
-                            right = val.substring(pos),
-                            leftChar = left.charAt(left.length - 1),
-                            rightChar = right.charAt(0),
-                            i;
-                        for(i=0; i<charSettings.keyMap.length; i++) {
-                            if (charSettings.keyMap[i].open == leftChar && charSettings.keyMap[i].close == rightChar) {
-                                utils.preventDefaultEvent(e);
-                                var edited = val.substring(0,pos-1) + val.substring(pos+1);
-                                utils.editor.set(edited);
-                                utils.cursor.set(pos - 1);
-                            }
-                        }
-                    }
-                }
-            }
+	            if(!utils.fenceRange()){ return; }
+	
+	            if(e.keyCode == 8){
+	            	utils.preventDefaultEvent(e);
+	                            
+	            	utils._callHook('delete:before');
+	            	
+	            	var pos = utils.cursor.get(),
+	                    val = utils.editor.get(),
+	                    left = val.substring(0, pos),
+	                    right = val.substring(pos),
+	                    leftChar = left.charAt(left.length - 1),
+	                    rightChar = right.charAt(0),
+	                    i;
+	            	
+	                if( utils.cursor.selection() === false ){
+	                    for(i=0; i<charSettings.keyMap.length; i++) {
+	                        if (charSettings.keyMap[i].open == leftChar && charSettings.keyMap[i].close == rightChar) {
+	                            var edited = val.substring(0,pos-1) + val.substring(pos+1);
+	                            utils.editor.set(edited);
+	                            utils.cursor.set(pos - 1);
+	                            return;
+	                        }
+	                    }
+	                    var edited = val.substring(0,pos-1) + val.substring(pos);
+	                    utils.editor.set(edited);
+	                    utils.cursor.set(pos - 1);
+	                } else {
+	                	var sel = utils.cursor.selection(),
+	                		edited = val.substring(0,sel.start) + val.substring(sel.end);
+	                    utils.editor.set(edited);
+	                    utils.cursor.set(pos);
+	                }
+	                
+	                utils._callHook('delete:after');
+	                
+	            }
+	        }
         },
         charFuncs = {
             openedChar: function (_char, e) {
                 utils.preventDefaultEvent(e);
+                utils._callHook('openChar:before');
                 var pos = utils.cursor.get(),
                     val = utils.editor.get(),
                     left = val.substring(0, pos),
@@ -416,6 +518,7 @@
 
                 defaults.textarea.value = edited;
                 utils.cursor.set(pos + 1);
+                utils._callHook('openChar:after');
             },
             closedChar: function (_char, e) {
                 var pos = utils.cursor.get(),
@@ -423,7 +526,9 @@
                     toOverwrite = val.substring(pos, pos + 1);
                 if (toOverwrite == _char.close) {
                     utils.preventDefaultEvent(e);
+                    utils._callHook('closeChar:before');
                     utils.cursor.set(utils.cursor.get() + 1);
+                    utils._callHook('closeChar:after');
                     return true;
                 }
                 return false;
@@ -461,11 +566,15 @@
                 if(defaults.autoStrip){ utils.addEvent(defaults.textarea, 'keydown', intercept.deleteKey); }
 
                 utils.addEvent(defaults.textarea, 'keypress', action.filter);
+                
+                utils.addEvent(defaults.textarea, 'keydown', function(){ utils._callHook('keydown'); });
+                utils.addEvent(defaults.textarea, 'keyup', function(){ utils._callHook('keyup'); });
             }
         },
         init = function (opts) {
 
             if(opts.textarea){
+            	utils._callHook('init:before', false);
                 utils.deepExtend(defaults, opts);
                 utils.defineNewLine();
 
@@ -478,15 +587,16 @@
                 }
 
                 action.listen();
+                utils._callHook('init:after', false);
             }
 
         };
 
         this.destroy = function(){
-            defaults.textarea.removeEventListener('keydown', intercept.tabKey);
-            defaults.textarea.removeEventListener('keydown', intercept.enterKey);
-            defaults.textarea.removeEventListener('keydown', intercept.deleteKey);
-            defaults.textarea.removeEventListener('keypress', action.filter);
+            utils.removeEvent(defaults.textarea, 'keydown', intercept.tabKey);
+	        utils.removeEvent(defaults.textarea, 'keydown', intercept.enterKey);
+	        utils.removeEvent(defaults.textarea, 'keydown', intercept.deleteKey);
+	        utils.removeEvent(defaults.textarea, 'keypress', action.filter);
         };
 
         init(userOpts);
@@ -499,6 +609,7 @@
 
     if (typeof ender === 'undefined') {
         this.Behave = Behave;
+        this.BehaveHooks = BehaveHooks;
     }
 
     if (typeof define === "function" && define.amd) {

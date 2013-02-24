@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>Behave</title>
+  
+	<style type='text/css'>
+		
+		body{
+			text-align:center;
+			padding:10px;
+		}
+		textarea, #log{
+			vertical-align:top;
+		}
+		textarea{
+			width:300px;
+			height: 250px;
+			
+			border:1px solid #999;
+			padding:10px;
+			font-family: monospace;
+			margin:0;
+			outline:none;
+			}
+			textarea:focus{
+				border-color:#333;
+			}
+		#log{
+			display:inline-block;
+			width: 300px;
+			height: 250px;
+			
+			background:#eee;
+			
+			border:1px solid #ccc;
+			color:444;
+			padding:10px;
+			font-family: monospace;
+			overflow:auto;
+			text-align: left;
+			}
+			#log .light{
+				color:#999;
+			}
+	</style>
+</head>
+<body>
+	
+	<h1>Details Hook</h1>
+	
+	<textarea id="demo"></textarea>
+	<div id="log"></div>
+	
+	<script type='text/javascript' src="../behave.js"></script>
+	<script type="text/javascript">
+	
+		window.onload = function(){
+			
+			var logCount=1,
+				_log = function(what, klass){
+				var log = document.getElementById('log');
+				if(klass){
+					klass = ' class="'+klass+'"';
+				} else {
+					klass = '';
+				}
+				log.innerHTML += '<div'+klass+'>'+logCount+': '+what+'</div>';
+				log.scrollTop = log.scrollHeight;
+				logCount++;
+			};
+			
+			/*
+			 * This hook adds autosizing functionality
+			 * to your textarea
+			 */
+			
+			BehaveHooks.add(['init:before'], function(data){ _log('Behave about to Initialize'); });
+			BehaveHooks.add(['init:after'], function(data){ _log('Behave Initialized'); });
+			
+			BehaveHooks.add(['enter:before'], function(data){ _log('Enter pressed on line '+data.lines.current); });
+			BehaveHooks.add(['enter:after'], function(data){ _log('Now on line '+data.lines.current); });
+			
+			BehaveHooks.add(['tab:before'], function(data){ _log('Pressed tab at char '+data.caret.pos); });
+			BehaveHooks.add(['tab:after'], function(data){ _log('Now at char '+data.caret.pos); });
+			
+			BehaveHooks.add(['delete:before'], function(data){ _log('About to delete from char '+data.caret.pos); });
+			BehaveHooks.add(['delete:after'], function(data){ _log('Now at char '+data.caret.pos); });
+			
+			BehaveHooks.add(['openChar:before'], function(data){ _log('About to open a paired character'); });
+			BehaveHooks.add(['openChar:after'], function(data){ _log('Opened a paired character'); });
+			
+			BehaveHooks.add(['closeChar:before'], function(data){ _log('About to close a paired character'); });
+			BehaveHooks.add(['closeChar:after'], function(data){ _log('Closed a paired character'); });
+			 
+			BehaveHooks.add(['keydown'], function(data){ _log('Keydown pressed', 'light'); });
+			
+			
+			var editor = new Behave({
+			
+				textarea: 		document.getElementById('demo'),
+				replaceTab: 	true,
+			    softTabs: 		true,
+			    tabSize: 		4,
+			    autoOpen: 		true,
+			    overwrite: 		true,
+			    autoStrip: 		true,
+			    autoIndent: 	true
+			});
+			
+		};
+	</script>
+</body>
+</html>
