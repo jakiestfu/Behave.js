@@ -89,6 +89,69 @@ editor.destroy();
 </ul>
 
 
+## Hooks
+Hooks are fired at different times through Behave. To add your own hooks to extend the functionality of Behave, use the `BehaveHooks` function.
+```javascript
+BehaveHooks.add('keydown', function(data){
+    // Your Code
+});
+```
+The `add` function accepts two parameters, the hook name, and the function.
+<dl class="params">
+	<dt><span>hookName</span></dt>
+	<dd><p>The hook you want to add an event for. May be a string or an array of hook names</p></dd>
+	<dt><span>fn</span></dt>
+	<dd><p>The function you want to fire on the hook event</p></dd>
+</dl>
+
+The following hook names are available for use:
+
+<dl class="params">
+	<dt><span>init:before</span></dt>
+	<dd><p>Called before initializing Behave</p></dd>
+	<dt><span>init:after</span></dt>
+	<dd><p>Called after initializing Behave</p></dd>
+	
+	<dt><span>enter:before</span></dt>
+	<dd><p>Called before inserting the text triggered by the enter key</p></dd>
+	<dt><span>enter:after</span></dt>
+	<dd><p>Called after inserting the text triggered by the enter key</p></dd>
+	
+	<dt><span>delete:before</span></dt>
+	<dd><p>Called before deleting the text triggered by the delete key</p></dd>
+	<dt><span>delete:after</span></dt>
+	<dd><p>Called after deleting the text triggered by the delete key</p></dd>
+	
+	<dt><span>tab:before</span></dt>
+	<dd><p>Called before inserting the text triggered by the tab key</p></dd>
+	<dt><span>tab:after</span></dt>
+	<dd><p>Called after inserting the text triggered by the tab key</p></dd>
+	
+	<dt><span>keyup</span></dt>
+	<dd><p>Called before modifying the text triggered by the keyup event</p></dd>
+	<dt><span>keydown</span></dt>
+	<dd><p>Called after modifying the text triggered by the keydown event</p></dd>
+</dl>
+				
+Each hook <b>excluding the init hooks</b> accept a single parameter, an object with the following information:
+```javascript
+{
+    caret: {
+	    pos: 5
+    },
+    editor: {
+	    element: textarea
+	    levelsDeep: 1,
+	    text: 'foo{}'
+    },
+    lines: {
+	    current: 1,
+	    total: 1
+    }
+}
+```
+
+
 ## License 
 **MIT Licensing**
 	<p>Copyright (c) 2013 Jacob Kelley</p>
