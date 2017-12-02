@@ -1,0 +1,22 @@
+{
+  "name": "behave-js",
+  "version": "1.5.0",
+  "description": "A lightweight, cross browser library for adding IDE style behaviors to plain text areas",
+  "main": "behave.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jakiestfu/Behave.js.git"
+  },
+  "author": "Jacob Kelley <jakie8@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jakiestfu/Behave.js/issues"
+  },
+  "homepage": "https://github.com/jakiestfu/Behave.js#readme"
+}
